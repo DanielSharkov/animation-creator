@@ -203,6 +203,11 @@
 		closeModal()
 	}
 
+	function discardAllProjects() {
+		animations.reset()
+		closeModal()
+	}
+
 	function onOpenModal(id: Modals) {
 		stopAnimation()
 	}
@@ -260,6 +265,8 @@
 				selectedStepWatcher()
 			}
 			selectedStepWatcher = $currentProjectReacted.subscribe(($)=> {
+				animations.syncProjectsWithStorage()
+
 				selectedStep = $.steps[$.selectedStep]
 				stepsExisting = $.steps.length > 0
 				durationSteps = Array(Number(($.duration/250).toFixed(0)) + 1)
@@ -425,6 +432,13 @@
 				{/if}
 			</div>
 
+			<button on:click={()=> openModal(Modals.DiscardWholeProject)} class='btn has-icon'>
+				<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+					<path d='M18 4.8V20.8H6V4.8M9 7.6L9 18M12 7.6L12 18M15 7.6L15 18M4 4.8L8.00002 4.8M8.00002 4.8L16 4.8M8.00002 4.8L10 3L14 3L16 4.8M16 4.8L20 4.8'/>
+				</svg>
+				<span class='label'>Discard everything</span>
+			</button>
+
 			<button on:click={()=> showSidebarRight = !showSidebarRight} class='btn even-pdg align-right'>
 				<svg class='icon stroke icon-2' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 					<path d='M3 6H21'/> <path d='M3 12H21'/> <path d='M9 18H21'/>
@@ -579,6 +593,7 @@
 	{animations}
 	{onOpenModal}
 	on:approveAnimDiscard={approveAnimDiscard}
+	on:discardAllProjects={discardAllProjects}
 />
 
 

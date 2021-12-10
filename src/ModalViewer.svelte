@@ -1,5 +1,8 @@
 <script lang='ts' context='module'>
-	export enum Modals {None, Target, Export, Import, DiscardAnim, ImportKeepOrDiscard}
+	export enum Modals {
+		None, Target, Export, Import, DiscardAnim,
+		ImportKeepOrDiscard, DiscardWholeProject,
+	}
 	let opendModal = writable(Modals.None)
 
 	let _onOpenModal: (id: Modals)=> void
@@ -259,6 +262,35 @@
 		</div>
 	{/if}
 
+	{#if $opendModal === Modals.DiscardWholeProject}
+		<div class='modal discard-projects' transition:modalAnim>
+			<div class='header flex content-center-y gap-1'>
+				<svg class='icon icon-3' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+					<path stroke='#ffff00' d='M12 9V16M12 3L2 21H22L12 3ZM12 17.5L11.5 18L12 18.5L12.5 18L12 17.5Z'/>
+				</svg>
+				<h1>Discard everything</h1>
+			</div>
+
+			<p>Are you sure you want to discard all projects including the targets HTML & CSS?</p>
+
+			<div class='actions flex content-center-y'>
+				<button on:click={()=> dispatch('discardAllProjects')} class='discard btn has-icon'>
+					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+						<path d='M18 4.8V20.8H6V4.8M9 7.6L9 18M12 7.6L12 18M15 7.6L15 18M4 4.8L8.00002 4.8M8.00002 4.8L16 4.8M8.00002 4.8L10 3L14 3L16 4.8M16 4.8L20 4.8'/>
+					</svg>
+					<span class='label'>Discard</span>
+				</button>
+
+				<button on:click={closeModal} class='cancel btn has-icon align-right'>
+					<svg class='icon icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+						<path stroke='#4caf50' d='M19 5L5 19M5 5L19 19'/>
+					</svg>
+					<span class='label'>Keep</span>
+				</button>
+			</div>
+		</div>
+	{/if}
+
 	{#if $opendModal === Modals.ImportKeepOrDiscard}
 		<div class='modal import-keep-or-discard' transition:modalAnim>
 			<div class='header flex content-center-y gap-1'>
@@ -335,13 +367,15 @@
 	.modal.export,
 	.modal.import
 	.modal.discard-anim,
-	.import-keep-or-discard
+	.import-keep-or-discard,
+	.discard-projects
 		max-width: 600px
 	.modal.export > .body > .field > .label
 		font-size: 1.25em
 		color: var(--prime)
 	.modal.discard-anim .actions > .discard,
-	.modal.import-keep-or-discard .actions > .discard
+	.modal.import-keep-or-discard .actions > .discard,
+	.modal.discard-projects .actions > .discard
 		color: #ff1744
 
 .import-info

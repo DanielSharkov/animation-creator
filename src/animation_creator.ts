@@ -1,4 +1,4 @@
-import {Readable, writable, get as getStore} from 'svelte/store'
+import {Readable, writable, get as getStore, Updater} from 'svelte/store'
 
 export const EasingFunctions = [
 	{name: 'Linear',       value: 'linear'},
@@ -44,6 +44,9 @@ export type T_AnimationCreator = {
 	viewportBg: string
 }
 
+const LocStr_AnimCreator = 'git@github.com:DanielSharkov/animation-creator'
+const LocStr_Projects = 'git@github.com:DanielSharkov/animation-creator__projects'
+
 export class AnimationCreator implements Readable<T_AnimationCreator> {
 	#store = writable<T_AnimationCreator>({
 		curPrj: 0,
@@ -54,50 +57,92 @@ export class AnimationCreator implements Readable<T_AnimationCreator> {
 	readonly subscribe = this.#store.subscribe
 
 	constructor() {
+		let notInited = true
+
+		if ('localStorage' in window) {
+			const locStr = localStorage.getItem(LocStr_AnimCreator)
+			if (locStr) {
+				notInited = false
+				const json: T_AnimationCreator = JSON.parse(locStr)
+				this.#store.update(($)=> {
+					$.curPrj = json.curPrj
+					$.target = json.target
+					$.viewportBg = json.viewportBg
+					return $
+				})
+			}
+			const prjsLocStr = localStorage.getItem(LocStr_Projects)
+			if (prjsLocStr) {
+				this.#store.update(($)=> {
+					for (const preset of JSON.parse(prjsLocStr)) {
+						$.projects.push(new AnimationProject(preset))
+					}
+					return $
+				})
+			}
+		}
+
+		if (notInited) { // init examples
+			console.log('initing examples')
+			this.#store.update(($)=> {
+				$.target.html = `\<div id='TestBall'\>\</div\>\n\<div id='TestBall2'\>\</div\>`
+				$.target.css = (
+					`#TestBall, #TestBall2 {` +
+						`\n\twidth: 150px;` +
+						`\n\theight: 150px;` +
+						`\n\tborder-radius: 100%;` +
+						`\n\toutline: dotted 6px #fff5;` +
+					`\n}\n` +
+					`#TestBall {` +
+						`\n\tbackground-color: #f00;` +
+					`\n}\n` +
+					`#TestBall2 {` +
+						`\n\tbackground-color: yellow;` +
+						`\n\ttransform-origin: 100%;` +
+					`\n}`
+				)
+				return $
+			})
+			this.newProject({
+				name: 'ball_1',
+				targetEl: '#TestBall',
+				steps: [
+					{pos: 0, styles: `background-color: red;\ntransform: translateY(0);`},
+					{pos: 50, styles: `background-color: green;\ntransform: translateY(100%) scale(1.5);`},
+					{pos: 100, styles: `background-color: blue;\ntransform: translateY(0);`},
+				],
+				timingFunction: EasingFunctions[7].value,
+			})
+			this.newProject({
+				name: 'ball_2',
+				targetEl: '#TestBall2',
+				steps: [
+					{pos: 0, styles: `background-color: yellow;\ntransform: translateY(0);`},
+					{pos: 50, styles: `background-color: purple;\ntransform: translateX(50%) rotate(45deg) scale(1.5);`},
+					{pos: 100, styles: `background-color: red;\ntransform: translateY(0);`},
+				],
+				timingFunction: EasingFunctions[12].value,
+			})
+			this.selectProject(0)
+		}
+	}
+
+	#update(fn: Updater<T_AnimationCreator>) {
 		this.#store.update(($)=> {
-			$.target.html = `\<div id='TestBall'\>\</div\>\n\<div id='TestBall2'\>\</div\>`
-			$.target.css = (
-				`#TestBall, #TestBall2 {` +
-					`\n\twidth: 150px;` +
-					`\n\theight: 150px;` +
-					`\n\tborder-radius: 100%;` +
-					`\n\toutline: dotted 6px #fff5;` +
-				`\n}\n` +
-				`#TestBall {` +
-					`\n\tbackground-color: #f00;` +
-				`\n}\n` +
-				`#TestBall2 {` +
-					`\n\tbackground-color: yellow;` +
-					`\n\ttransform-origin: 100%;` +
-				`\n}`
-			)
+			$ = fn($)
+			if ('localStorage' in window) {
+				localStorage.setItem(LocStr_AnimCreator, JSON.stringify({
+					curPrj: $.curPrj,
+					target: $.target,
+					viewportBg: $.viewportBg,
+				}))
+			}
 			return $
 		})
-		this.newProject({
-			name: 'ball_1',
-			targetEl: '#TestBall',
-			steps: [
-				{pos: 0, styles: `background-color: red;\ntransform: translateY(0);`},
-				{pos: 50, styles: `background-color: green;\ntransform: translateY(100%) scale(1.5);`},
-				{pos: 100, styles: `background-color: blue;\ntransform: translateY(0);`},
-			],
-			timingFunction: EasingFunctions[7].value,
-		})
-		this.newProject({
-			name: 'ball_2',
-			targetEl: '#TestBall2',
-			steps: [
-				{pos: 0, styles: `background-color: yellow;\ntransform: translateY(0);`},
-				{pos: 50, styles: `background-color: purple;\ntransform: translateX(50%) rotate(45deg) scale(1.5);`},
-				{pos: 100, styles: `background-color: red;\ntransform: translateY(0);`},
-			],
-			timingFunction: EasingFunctions[12].value,
-		})
-		this.selectProject(0)
 	}
 
 	newProject(preset?: AnimationProjectPreset) {
-		this.#store.update(($)=> {
+		this.#update(($)=> {
 			$.projects.push(new AnimationProject(preset))
 			$.curPrj = $.projects.length-1
 			return $
@@ -105,14 +150,14 @@ export class AnimationCreator implements Readable<T_AnimationCreator> {
 	}
 
 	selectProject(idx: number) {
-		this.#store.update(($)=> {
+		this.#update(($)=> {
 			$.curPrj = idx
 			return $
 		})
 	}
 
 	discardProject() {
-		this.#store.update(($)=> {
+		this.#update(($)=> {
 			$.projects.splice($.curPrj, 1)
 			$.curPrj -= 1
 			if ($.curPrj < 0) $.curPrj = 0
@@ -125,21 +170,21 @@ export class AnimationCreator implements Readable<T_AnimationCreator> {
 	}
 
 	changeTargetHTML(code: string) {
-		this.#store.update(($)=> {
+		this.#update(($)=> {
 			$.target.html = code
 			return $
 		})
 	}
 
 	changeTargetCSS(code: string) {
-		this.#store.update(($)=> {
+		this.#update(($)=> {
 			$.target.css = code
 			return $
 		})
 	}
 
 	import(presets: AnimationProjectPreset[], keepState: boolean) {
-		this.#store.update(($)=> {
+		this.#update(($)=> {
 			if (keepState !== true) {
 				$.projects = []
 			}
@@ -150,11 +195,36 @@ export class AnimationCreator implements Readable<T_AnimationCreator> {
 		})
 	}
 
+	syncProjectsWithStorage() {
+		if ('localStorage' in window) {
+			const prjs: AnimationProjectPreset[] = []
+			for (const prj of getStore(this.#store).projects) {
+				prjs.push(getStore(prj))
+			}
+			localStorage.setItem(LocStr_Projects, JSON.stringify(prjs))
+		}
+	}
+
 	setViewportBg(color: string) {
-		this.#store.update(($)=> {
+		this.#update(($)=> {
 			$.viewportBg = color
 			return $
 		})
+	}
+
+	reset() {
+		this.#store.update(($)=> {
+			$.target = {html: '', css: ''}
+			$.viewportBg = 'transparent'
+			$.projects = []
+			$.projects.push(new AnimationProject())
+			$.curPrj = 0
+			return $
+		})
+		if ('localStorage' in window) {
+			localStorage.removeItem(LocStr_AnimCreator)
+			localStorage.removeItem(LocStr_Projects)
+		}
 	}
 }
 
@@ -195,16 +265,17 @@ export type T_AnimationProject = {
 }
 
 export interface AnimationProjectPreset {
-	name?:           string
-	duration?:       number
-	delay?:          number
-	timingFunction?: string
-	iterations?:     number // 0 == infinite
-	fillMode?:       AnimFillmode
-	direction?:      AnimDirection
-	steps?:          Array<AnimStep>
-	selectedStep?:   number
-	targetEl?:       string // CSS Selector
+	name?:                string
+	duration?:            number
+	stepsRelativeToTime?: boolean
+	delay?:               number
+	timingFunction?:      string
+	iterations?:          number // 0 == infinite
+	fillMode?:            AnimFillmode
+	direction?:           AnimDirection
+	steps?:               Array<AnimStep>
+	selectedStep?:        number
+	targetEl?:            string // CSS Selector
 }
 
 export class AnimationProject implements Readable<T_AnimationProject> {
