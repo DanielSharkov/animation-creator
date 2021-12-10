@@ -13,10 +13,6 @@
 	onMount(()=> {
 		targetShadowDOM = targetViewportEl.attachShadow({mode: 'open'})
 		animations.selectProject(0)
-		// targetShadowDOM.innerHTML = (
-		// 	wrapInTags('style', _cachedTargetStyles) +'\n'+
-		// 	$animations.target.html
-		// )
 	})
 
 	const animations = new AnimationCreator

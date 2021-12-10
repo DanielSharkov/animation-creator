@@ -186,7 +186,6 @@ export function parseCssImport(css: string) {
 			if (timeFunc) {
 				curPrj(animName).timingFunction = timeFunc
 			}
-			console.log('anim preset: ', [preset, animName, timeFunc, props])
 			for (const prop of props) {
 				// tailing space
 				if (prop === '') continue
@@ -255,12 +254,10 @@ export function parseCssImport(css: string) {
 					continue
 				}
 
-				console.log(prop, props)
 				throw new Error(
 					`Unable to handle "${prop}" on animation preset "${animName}".`
 				)
 			}
-			console.log('curPrj:', curPrj(animName))
 			isAnimPresets = false
 			cursor = idx
 		}
@@ -280,27 +277,24 @@ export function parseCssImport(css: string) {
 				currentCodeBlock = null
 			}
 			else if (char === '{') {
-				if (currentStepPos === null) {
-					throw new Error(
-						`Missing step position in "${currentCodeBlock}" at "${css.slice(cursor, idx)}".`
-					)
-				}
-				isCurrentStepBlock = true
-				cursor = idx+1
-			}
-			else if (char === '%') {
 				if (currentStepPos !== null) {
 					throw new Error(
 						`Invalid step position in "${currentCodeBlock}" at step "${currentStepPos}".`
 					)
 				}
-				const pos = Number(css.slice(cursor, idx).trim())
+
+				let strPos = css.slice(cursor, idx).trim()
+				if (strPos === 'from') strPos = '0%'
+				if (strPos === 'to') strPos = '100%'
+				const pos = Number(strPos.slice(0, strPos.length-1)) // remove %
+
 				if (Number.isNaN(pos)) {
 					throw new Error(
 						`Invalid step in "${currentCodeBlock}" on position "${css.slice(cursor, idx)}".`
 					)
 				}
 				currentStepPos = pos
+				isCurrentStepBlock = true
 				cursor = idx+1
 			}
 		}
