@@ -1,0 +1,597 @@
+html
+	--trans-ease: cubic-bezier(.4, 0, .2, 1)
+
+	--prime: #40c4ff
+	--prime-01: rgba(#40c4ff, .1)
+	--prime-05: rgba(#40c4ff, .5)
+	--bg: #000
+	--fg: #151515
+	--border: #444
+	--font: #bbb
+	--heading: #fff
+	--btn-bg: transparent
+	--btn-font: var(--font)
+	--btn-border: #555
+	--btn-shadow: none
+	--btn-H-bg: rgba(#fff, .15)
+	--btn-H-font: var(--heading)
+	--btn-H-border: #fff
+	--btn-H-shadow: 0 0 20px rgba(#fff, .35)
+	--btn-A-bg: var(--heading)
+	--btn-A-font: var(--bg)
+	--btn-A-border: var(--heading)
+	--btn-A-shadow: 0 0 20px rgba(#fff, .5)
+
+html, body
+	width: 100%
+	height: 100%
+	margin: 0
+	padding: 0
+	box-sizing: border-box
+	border: none
+	outline: none
+	background-color: var(--bg)
+	color: var(--font)
+	overflow: hidden
+
+body
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+	color: var(--font)
+
+*
+	margin: 0
+	padding: 0
+	background: none
+	border: none
+	color: inherit
+	outline: none
+	box-sizing: border-box
+	&:before, &:after
+		margin: 0
+		padding: 0
+		background: none
+		border: none
+		color: inherit
+		outline: none
+		box-sizing: border-box
+
+main
+	display: flex
+	height: 100%
+	flex-flow: column wrap
+
+button, select, label[for], input[type=color]
+	cursor: pointer
+
+button.btn, select
+	display: flex
+	flex-flow: row nowrap
+	gap: .5em
+	align-items: center
+	color: inherit
+	padding: .5em 1em
+	border: solid 1px var(--btn-border)
+	background-color: var(--btn-bg)
+	box-shadow: 0 0 0 2px var(--bg) inset
+	color: var(--btn-font)
+	&:hover
+		border-color: var(--btn-H-border)
+		background-color: var(--btn-H-bg)
+		box-shadow: var(--btn-H-shadow)
+		color: var(--btn-H-font)
+	&:active, &:focus
+		border-color: var(--btn-A-border)
+		background-color: var(--btn-A-bg)
+		box-shadow: var(--btn-A-shadow)
+		color: var(--btn-A-font)
+	&[disabled]
+		opacity: .5
+		background-color: var(--btn-H-bg)
+		pointer-events: none
+	&.has-icon
+		padding: .5em 1em .5em .5em
+	&.small
+		padding: .15em .5em
+	&.even-pdg
+		padding: .5em
+		&.small
+			padding: .15em
+
+.btn-group
+	position: relative
+	display: flex
+	flex-flow: row wrap
+	border: solid 1px var(--btn-border)
+	background-color: var(--btn-bg)
+	color: var(--btn-font)
+	&:after
+		z-index: 1
+		content: ''
+		position: absolute
+		top: 0
+		right: 0
+		bottom: 0
+		left: 0
+		pointer-events: none
+	> button
+		display: flex
+		flex-flow: row nowrap
+		gap: .5em
+		justify-content: center
+		align-items: center
+		color: inherit
+		flex: 1 1 auto
+		padding: .5em
+		&:not(:last-child)
+			border-right: solid 1 var(--btn-border)
+		&:hover
+			border-color: var(--btn-H-border)
+			background-color: var(--btn-H-bg)
+			color: var(--btn-H-font)
+		&:active, &:focus
+			border-color: var(--btn-A-border)
+			background-color: var(--btn-A-bg)
+			box-shadow: var(--btn-A-shadow)
+			color: var(--btn-A-font)
+		&.active
+			border-color: var(--btn-A-border)
+			background-color: var(--prime)
+			box-shadow: 0 0 20px var(--prime-05)
+			color: var(--btn-A-font)
+
+select option
+	font-size: 1.1em
+	background-color: var(--bg)
+	color: var(--font)
+
+.select-wrapper
+	position: relative
+	> label
+		padding: .5em 1em
+		border: solid 1px var(--btn-border)
+		background-color: var(--btn-bg)
+		box-shadow: var(--btn-shadow)
+		color: var(--btn-font)
+		&:hover
+			border-color: var(--btn-H-border)
+			background-color: var(--btn-H-bg)
+			box-shadow: var(--btn-H-shadow)
+			color: var(--btn-H-font)
+	> select
+		position: absolute
+		top: 0
+		left: 0
+		width: 100%
+		height: 100%
+		padding: .5em
+		background-color: var(--btn-bg)
+		color: var(--btn-font)
+		&:not(:focus)
+			pointer-events: none
+			opacity: 0
+
+.flex
+	display: flex
+	flex-flow: row wrap
+	&.nowrap
+		flex-wrap: nowrap
+	&.column
+		flex-direction: column
+	> .align-right
+		margin-left: auto
+	> .align-left
+		margin-right: auto
+	&.content-center
+		justify-content: center
+		align-content: center
+		align-items: center
+	&.content-center-y
+		align-content: center
+		align-items: center
+	&.content-center-x
+		justify-content: center
+
+.grid
+	display: grid
+	grid-template-columns: 1fr
+
+.flex, .grid
+	&.gap-05
+		gap: .5rem
+	&.gap-1
+		gap: 1rem
+	&.gap-15
+		gap: 1.5rem
+	&.gap-2
+		gap: 2rem
+
+.icon
+	&.stroke
+		stroke: currentColor
+	&.fill
+		fill: currentColor
+	&.icon-1
+		width: 1em
+		height: 1em
+	&.icon-15
+		width: 1.5em
+		height: 1.5em
+	&.icon-2
+		width: 2em
+		height: 2em
+	&.icon-3
+		width: 3em
+		height: 3em
+
+h1, h2, h3, h4, h5, h6
+	font-family: inherit
+	color: var(--heading)
+
+input, button, textarea, span, a, p, small, q, b, i,
+label, dl, dt, dd, select, optgroup, pre, code
+	font-size: inherit
+
+h1, h2, h3, h4, h5, h6,
+p, textarea, .paragraph
+	line-height: 1.5
+
+input, textarea
+	padding: .5em
+	border: solid 1px var(--border)
+	tab-size: 2em
+	&:hover
+		border-color: var(--heading)
+		&+ label
+			color: var(--heading)
+	&:focus, &:active
+		background-color: var(--prime-01)
+		border-color: var(--prime)
+		color: var(--heading)
+		&+ label
+			color: var(--prime)
+
+.input-field
+	display: flex
+	flex-direction: column-reverse
+	> label
+		margin-bottom: .5em
+	> textarea
+		resize: vertical
+
+.checkbox
+	border: solid 2px var(--btn-border)
+	transition-duration: .2s
+	transition-property: background-color, border-color
+	will-change: background-color, border-color
+	> svg
+		width: 1em
+		height: 1em
+		> *
+			stroke: var(--prime)
+			stroke-dasharray: 0 21
+			stroke-dashoffset: 1
+			transition-duration: .2s
+			transition-property: stroke-dasharray
+			will-change: stroke-dasharray
+	&.active
+		background-color: var(--prime)
+		border-color: var(--prime)
+		> svg > *
+			stroke: var(--bg)
+			stroke-dasharray: 21
+
+header
+	flex: 0 0 auto
+	width: 100%
+	border-bottom: solid 1px var(--border)
+	.tab-bar
+		.tabs
+			flex: 1 1 auto
+			overflow-x: auto
+			> button
+				flex: 0 1 auto
+				padding: .25em .5em
+				border: none
+				border-right: solid 1px var(--border)
+				border-top: solid 2px transparent
+				border-bottom: solid 1px var(--border)
+				box-shadow: none
+				white-space: nowrap
+				&:not(.active)
+					background-color: #111
+				&:hover, &:focus
+					background-color: #333
+				&.active
+					background-color: var(--bg)
+					border-top-color: var(--prime)
+					border-bottom-color: transparent
+				&.new-project
+					&:hover
+						color: #4caf50
+					&:active, &:focus
+						background-color: #4caf50
+						color: var(--bg)
+			.empty-space
+				flex: 1 1 0
+				border-bottom: solid 1px var(--border)
+		.options
+			flex: 0 0 auto
+			border-bottom: solid 1px var(--border)
+			> button
+				padding: .5em 1em
+				border: none
+				border-left: solid 1px var(--border)
+				box-shadow: none
+				&.export
+					font-size: 1.1em
+					color: #4caf50
+					&:hover, &:focus
+						background-color: #4caf50
+						color: var(--bg)
+				&.import
+					font-size: 1.1em
+					color: var(--prime)
+					&:hover, &:focus
+						background-color: var(--prime)
+						color: var(--bg)
+	.project-options
+		padding: .5em
+		.viewport-bg-picker
+			position: relative
+			.color-preview
+				width: 1.5rem
+				height: 1.5rem
+				border: solid 1px var(--border)
+			&.transparent-bg > .btn > .color-preview,
+			.set-transparent .color-preview
+				background-size: .75rem
+				background-repeat: repeat
+				background-position: center
+				background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cg fill='%23666' fill-opacity='1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E")
+			.set-transparent .color-preview
+				width: 3rem
+				height: 3rem
+			.disclosure
+				z-index: 100
+				position: absolute
+				top: calc(100% + 1rem)
+				padding: 1rem
+				background-color: var(--bg)
+				border: solid 1px var(--border)
+				box-shadow: 0 0 20px #000
+				&:before
+					content: ''
+					position: absolute
+					top: -.5rem
+					left: 1rem
+					display: inline-block
+					width: 1rem
+					height: 1rem
+					background-color: var(--bg)
+					border: solid 1px
+					border-color: var(--border) #000 #000 var(--border)
+					transform: rotate(45deg)
+				.input-wrapper
+					position: relative
+					> .color-preview
+						pointer-events: none
+						width: 3rem
+						height: 3rem
+					> input
+						position: absolute
+						top: 0
+						left: 0
+						width: 100%
+						height: 100%
+						padding: 0
+						-webkit-appearance: none
+						opacity: 0
+						&::-webkit-color-swatch-wrapper
+							padding: 0
+							border: none
+						&::-webkit-color-swatch
+							border: none
+			&.transparent-bg .disclosure .set-transparent,
+			&:not(.transparent-bg) .disclosure .input-wrapper
+				.color-preview
+					border: solid 1px var(--prime)
+					box-shadow: 0 0 0 .1rem var(--bg) inset
+
+#Viewport
+	flex: 1 1 auto
+	position: relative
+	#AnimationTarget
+		flex: 1 1 auto
+		padding: 1rem
+		transition-duration: .3s
+		transition-property: margin
+		overflow: hidden
+	.sidebar-left, .sidebar-right
+		z-index: 20
+		position: absolute
+		top: 0
+		bottom: 0
+		width: 450px
+		overflow: hidden
+		overflow-y: auto
+		transition-duration: .3s
+		transition-property: transform
+		background-color: var(--bg)
+	.sidebar-left
+		left: 0
+		border-right: solid 1px var(--border)
+		align-content: start
+		padding: 1rem
+	.sidebar-right
+		right: 0
+		border-left: solid 1px var(--border)
+	&.transparent-bg #AnimationTarget
+		background-size: 1rem
+		background-position: center
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cg fill='%23111' fill-opacity='1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E")
+
+#AnimationSteps
+	border-top: solid 1px var(--border)
+	flex: 0 0 auto
+	padding: .5rem
+	.controls
+		padding: 1rem
+		button.pulse
+			animation: .45s pulseBtn infinite linear alternate
+	.timeline
+		position: relative
+		height: 6rem
+		margin: 1rem
+		border: solid 1px var(--border)
+		.player-cursor, .percent-steps, .duration-steps, .creation-pseudo-step
+			position: absolute
+			top: 0
+			right: 0
+			bottom: 0
+			left: 0
+			display: flex
+			flex-flow: row nowrap
+			pointer-events: none
+		.percent-steps > div
+			width: 1%
+			height: 100%
+			&:not(:first-child)
+				border-left: solid 1px rgba(#fff, .1)
+		.duration-steps
+			box-shadow: 0 0 0 2px var(--bg) inset
+			> div
+				position: absolute
+				top: 0
+				height: 10%
+				border-left: solid 1px var(--font)
+				> span
+					position: absolute
+					bottom: 150%
+					opacity: .3
+					font-size: .85em
+		.player-cursor > .cursor
+			width: 100%
+			height: 100%
+			border-left: solid 2px #f00
+			animation-name: moveCursor
+			&.stopped
+				animation: none !important
+		.actual-steps
+			position: relative
+			width: 100%
+			height: 100%
+			.step
+				position: absolute
+				top: 0
+				bottom: 0
+				width: 1px
+				background-color: var(--font)
+				transition-duration: .1s
+				transition-property: left
+				.clickable
+					position: absolute
+					top: 0
+					bottom: 0
+					width: 1em
+				.indicator
+					position: absolute
+					min-height: 50%
+					max-height: 100%
+					box-shadow: 0 0 0 1px var(--bg)
+					background-color: var(--bg)
+					border: solid 1px var(--font)
+					color: var(--font)
+					writing-mode: vertical-rl
+					@supports (-webkit-backdrop-filter: blur(1px))
+						left: 50%
+						top: 50%
+						transform: translate(-60%, -50%)
+				&.ignored:not(.selected):not(:hover):not(:focus)
+					opacity: .5
+				.ignored-label
+					position: absolute
+					bottom: 100%
+					border: solid 1px var(--border)
+					padding: .25em .5em
+					font-size: .85em
+					background-color: var(--bg)
+					box-shadow: 0 0 10px rgba(#fff, .15)
+					white-space: nowrap
+					line-height: 1.5
+					pointer-events: none
+					transition-duration: .15s
+					transition-property: opacity, transform
+					will-change: opacity, transform
+				&:not(:hover) .ignored-label
+					opacity: 0
+					transform: translateY(.5em)
+				&:hover, &:focus
+					z-index: 100
+					background-color: var(--heading)
+					.indicator
+						box-shadow: 0 0 0 1px var(--bg), 0 0 50px rgba(#fff, .75)
+						background-color: var(--heading)
+						color: var(--bg)
+				&.selected
+					z-index: 50
+					background-color: var(--prime)
+					.indicator
+						box-shadow: 0 0 0 1px var(--bg), 0 0 50px var(--prime)
+						background-color: var(--prime)
+						color: #000
+			&.moving
+				cursor: move !important
+				.step
+					pointer-events: none
+					transition-duration: 0s
+		.creation-pseudo-step .step
+			position: absolute
+			top: 0
+			bottom: 0
+			width: 1%
+			background-color: rgba(#fff, .25)
+			transform: translateX(-50%)
+			.indicator
+				position: absolute
+				height: 50%
+				box-shadow: 0 0 0 2px var(--bg)
+				background-color: var(--prime)
+				color: var(--bg)
+				writing-mode: vertical-rl
+				text-align: center
+		&.add-mode
+			animation: .45s borderPulseAdd infinite alternate linear
+			cursor: crosshair
+			.actual-steps
+				pointer-events: none
+				opacity: .5
+		&.delete-mode
+			animation: .45s borderPulseDelete infinite alternate linear
+			.actual-steps .step
+				animation: .5s deleteItemVibrate infinite cubic-bezier(0.37, 0, 0.63, 1)
+				&:hover
+					cursor: not-allowed
+					.indicator
+						box-shadow: 0 0 0 1px var(--bg), 0 0 50px #ff5252
+						background-color: #ff1744
+						border-color: #ff1744
+						color: #fff
+
+@keyframes pulseBtn
+	from { box-shadow: 0 0 30px transparent }
+	to   { box-shadow: 0 0 50px var(--prime) }
+
+@keyframes borderPulseAdd
+	from { box-shadow: 0 0 10px transparent }
+	to   { box-shadow: 0 0 30px #4caf50 }
+
+@keyframes borderPulseDelete
+	from { box-shadow: 0 0 10px transparent }
+	to   { box-shadow: 0 0 30px #ff1744 }
+
+@keyframes deleteItemVibrate
+	0%   { transform: translate(0,0) }
+	25%  { transform: translate(.15em,.15em) }
+	50%  { transform: translate(-.15em,0) }
+	75%  { transform: translate(.15em,-.15em) }
+	100% { transform: translate(0,0) }
