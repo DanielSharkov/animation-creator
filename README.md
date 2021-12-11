@@ -1,6 +1,6 @@
 # [Svelte](https://github.com/sveltejs/svelte) Animation Creator
 
-[![Open Animation Creator](https://img.shields.io/badge/▶-Open%20Animation%20Creator-448AFF)](https://danielsharkov.github.io/svelte-animation-creator)
+[![Open Animation Creator](https://img.shields.io/badge/▶-Open%20Animation%20Creator-448AFF)](https://danielsharkov.github.io/animation-creator)
 
 This app is pretty much self explained by intuitive design - no user manual needed. 📚
 
