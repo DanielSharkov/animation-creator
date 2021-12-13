@@ -5,7 +5,7 @@ import {Modals} from './ModalViewer.svelte'
 
 export let sidebarAnim
 export let openModal
-export let doesAnimTargetElExist: booleanv
+export let doesAnimTargetElExist: boolean
 export let currentProject: SvelteStore<AnimationProject>
 export let currentProjectStore
 
@@ -15,6 +15,17 @@ const timingFuncPanelAnim =(node, o?)=> ({
 		`transform: translateX(${101 - 101 * cubicOut(t)}%);`
 	)
 })
+
+function changeTargetElSelector(e: Event & {currentTarget: EventTarget & HTMLInputElement}) {
+	const sltr = e.currentTarget.value
+	try {
+		// check if selector is valid
+		document.querySelector(sltr)
+		$currentProject.targetChangeSelector(sltr)
+	} catch(err) {
+		e.currentTarget.value = $currentProjectStore.targetEl
+	}
+}
 
 let timingFuncSelection = false
 </script>
@@ -56,7 +67,7 @@ let timingFuncSelection = false
 			id='animation-name'
 			type='text'
 			value={$currentProjectStore.name}
-			on:change={(e)=> $currentProject.changeName(e.currentTarget.value)}
+			on:change={changeTargetElSelector}
 		/>
 		<label for='animation-name'>Name</label>
 	</div>
