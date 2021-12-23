@@ -1,78 +1,96 @@
 <script lang='ts' context='module'>
-	export enum Modals {
-		None, Target, Export, Import, DiscardAnim,
-		ImportKeepOrDiscard, DiscardWholeProject,
-	}
-	let opendModal = writable(Modals.None)
+export enum Modals {
+	None, Target, Export, Import, DiscardAnim,
+	ImportKeepOrDiscard, DiscardWholeProject,
+}
+let opendModal = writable(Modals.None)
 
-	let _onOpenModal: (id: Modals)=> void
-	export function openModal(id: Modals) {
-		_onOpenModal(id)
-		opendModal.set(id)
-	}
+let _onOpenModal: (id: Modals)=> void
+export function openModal(id: Modals) {
+	_onOpenModal(id)
+	opendModal.set(id)
+}
 
-	export function closeModal() {
-		opendModal.set(Modals.None)
-	}
+export function closeModal() {
+	opendModal.set(Modals.None)
+}
 </script>
 
 
 
+<svelte:window on:keydown|passive={(e)=> {
+	if (e.key.toLocaleLowerCase() == 'escape') {
+		if ([
+			Modals.Target,
+			Modals.Export,
+			Modals.Import,
+			Modals.DiscardAnim,
+			Modals.DiscardWholeProject,
+		].includes(
+			$opendModal
+		)) {
+			closeModal()
+		}
+	}
+}}/>
+
+
+
 <script lang='ts'>
-	import {buildProjects, copyToClipboard, parseCssImport} from './utils'
-	import type {AnimationProjectPreset} from './animation_creator'
-	import {createEventDispatcher} from 'svelte'
-	import {cubicInOut} from 'svelte/easing'
-	import {writable} from 'svelte/store'
-	const dispatch = createEventDispatcher()
+import {buildProjects, copyToClipboard, parseCssImport} from './utils'
+import type {AnimationProjectPreset} from './animation_creator'
+import {createEventDispatcher} from 'svelte'
+import {cubicInOut} from 'svelte/easing'
+import {writable} from 'svelte/store'
+const dispatch = createEventDispatcher()
 
-	export let animations
-	export let onOpenModal: (id: Modals)=> void
-	_onOpenModal = onOpenModal
+export let animations
+export let onOpenModal: (id: Modals)=> void
+_onOpenModal = onOpenModal
 
-	let importCode = ''
-	let importErr: null|Error = null
-	let parsedImport: AnimationProjectPreset[] = null
+let importCode = ''
+let importErr: null|Error = null
+let parsedImport: AnimationProjectPreset[] = null
 
-	function importAskToKeepState() {
-		closeModal()
-		setTimeout(()=> {
-			openModal(Modals.ImportKeepOrDiscard)
-		}, 300)
-	}
+function importAskToKeepState() {
+	closeModal()
+	setTimeout(()=> {
+		openModal(Modals.ImportKeepOrDiscard)
+	}, 300)
+}
 
-	function applyImport(keepState?: boolean) {
-		if (!parsedImport) return
+function applyImport(keepState?: boolean) {
+	if (!parsedImport) return
 
-		animations.import(parsedImport, keepState)
-		importCode = ''
+	animations.import(parsedImport, keepState)
+	importCode = ''
+	parsedImport = null
+	closeModal()
+}
+
+function parseImport() {
+	try {
 		parsedImport = null
-		closeModal()
+		parsedImport = parseCssImport(importCode)
 	}
-
-	function parseImport() {
-		try {
-			parsedImport = null
-			parsedImport = parseCssImport(importCode)
-		}
-		catch(err) {
-			importErr = err
-		}
+	catch(err) {
+		importErr = err
 	}
+}
 
-	const modalAnim =(node, isIntro?: boolean)=> ({
-		duration: 300,
-		css: (t)=> (
-			`transform: translateY(${2 - 2 * cubicInOut(t)}rem);`
-		)
-	})
+const modalAnim =(node, o?)=> ({
+	duration: 300,
+	css: (t)=> (
+		`transform: translateY(${2 - 2 * cubicInOut(t)}rem);`
+	)
+})
 </script>
 
 
 
 <div id='ModalViewport' class='flex' class:active={$opendModal !== Modals.None}>
 	{#if $opendModal === Modals.Target}
-		<div class='modal animation-target' in:modalAnim={true} out:modalAnim={false}>
+		<div class='modal animation-target' transition:modalAnim>
 			<div class='header flex content-center-y gap-1'>
 				<svg class='icon stroke icon-3' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 					<path d='M15.7736 5.36887C14.3899 4.50149 12.7535 4 11 4C6.02944 4 2 8.02944 2 13C2 17.9706 6.02944 22 11 22C15.9706 22 20 17.9706 20 13C20 11.3038 19.5308 9.71728 18.7151 8.36302'/>
@@ -113,7 +131,7 @@
 	{/if}
 
 	{#if $opendModal === Modals.Export}
-		<div class='modal export' in:modalAnim={true} out:modalAnim={false}>
+		<div class='modal export' transition:modalAnim>
 			<div class='header flex content-center-y gap-1'>
 				<svg class='icon stroke icon-3' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 					<path d='M20 8V22H4V2H12M20 8H12V2M20 8L12 2M12 11V19M12 19L9 16M12 19L15 16'/>

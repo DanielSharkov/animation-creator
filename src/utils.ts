@@ -1,6 +1,19 @@
 import {AnimationProject, AnimationProjectPreset, AnimDirection, AnimFillmode, AnimStep} from './animation_creator'
 import {get as getStore} from 'svelte/store'
 
+export function debounce(func: (...attrs: any)=> any, wait: number): (...attrs: any)=> any {
+	let timeout = null
+	return function() {
+		let context = this
+		let args = arguments
+		clearTimeout(timeout)
+		timeout = setTimeout(function() {
+			timeout = null
+			func.apply(context, args)
+		}, wait || 0)
+	}
+}
+
 export function htmlDecode(x: string) {
 	const doc = new DOMParser().parseFromString(x, 'text/html')
 	return doc.documentElement.textContent

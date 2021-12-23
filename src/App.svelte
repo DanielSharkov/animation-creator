@@ -1,9 +1,22 @@
+<script context='module' lang='ts'>
+	export enum CreatorAction {
+		None, AddStep, DeleteStep, ChangeVpBg, PrjTimeFn,
+	}
+	export const currentAction = writable(CreatorAction.None)
+
+	export function cancelCreatorAction() {
+		currentAction.set(CreatorAction.None)
+	}
+</script>
+
+
+
 <script lang='ts'>
 	import {onMount} from 'svelte'
 	import {AnimationCreator, AnimStep, AnimDirection, AnimFillmode} from './animation_creator'
 	import {cubicInOut} from 'svelte/easing'
 	import {derived, get as getStore, Unsubscriber, writable} from 'svelte/store'
-	import {renderAllKeyframeStyles, buildCursorKeyframeStyle, wrapInTags, selectedKeyframeStyle} from './utils'
+	import {renderAllKeyframeStyles, buildCursorKeyframeStyle, wrapInTags, selectedKeyframeStyle, debounce} from './utils'
 	import ModalViewer, {closeModal, Modals, openModal} from './ModalViewer.svelte'
 	import SidebarLeft from './SidebarLeft.svelte'
 	import SidebarRight from './SidebarRight.svelte'
@@ -22,7 +35,7 @@
 	$:doesAnimTargetElExist = (
 		targetShadowDOM &&
 		$currentProjectStore.targetEl &&
-		targetShadowDOM.querySelector($currentProjectStore.targetEl)
+		!!targetShadowDOM.querySelector($currentProjectStore.targetEl)
 	)
 
 	let selectedStep: AnimStep
@@ -122,12 +135,11 @@
 
 	let timelineEl: HTMLDivElement
 	function timelineClick(e) {
-		if (currentAction === CreatorAction.AddStep) {
+		if ($currentAction === CreatorAction.AddStep) {
 			const newIdx = $currentProject.addStep(
 				Number((100 / timelineEl.clientWidth * e.offsetX).toFixed(0))
 			)
 			if (newIdx > -1) {
-				cancelAction()
 				$currentProject.selectStep(newIdx)
 			}
 		}
@@ -149,7 +161,7 @@
 	}
 
 	function timelinePointerMove(e: PointerEvent) {
-		if (movingStepIdx !== null || currentAction === CreatorAction.AddStep) {
+		if (movingStepIdx !== null || $currentAction === CreatorAction.AddStep) {
 			movingStepPos = (
 				Number((100 / timelineEl.clientWidth * e.offsetX).toFixed(0))
 			)
@@ -157,12 +169,12 @@
 	}
 
 	function timelineStepGrabbing(pos: number, idx: number) {
-		if (currentAction === CreatorAction.None) {
+		if ($currentAction === CreatorAction.None) {
 			$currentProject.selectStep(idx)
 			movingStepIdx = idx
 			movingStepPos = pos
 		}
-		else if (currentAction === CreatorAction.DeleteStep) {
+		else if ($currentAction === CreatorAction.DeleteStep) {
 			$currentProject.discardStep(idx)
 		}
 	}
@@ -171,31 +183,77 @@
 		idx === movingStepIdx ? movingStepPos : pos
 	)
 
-	enum CreatorAction {None, AddStep, DeleteStep}
-	let currentAction = CreatorAction.None
+	function userKeyboardInput(e: KeyboardEvent) {
+		const target = e.target as HTMLElement
+		if (
+			target?.tagName &&
+			(target.tagName.toLowerCase() === 'input' ||
+			target.tagName.toLowerCase() === 'textarea')
+		) {
+			if (e.key.toLowerCase() === 'escape') {
+				target.blur()
+			}
+			return
+		}
 
-	function cancelAction() {
-		currentAction = CreatorAction.None
-	}
+		if (e.key.toLowerCase() === 'escape') {
+			e.preventDefault()
+			cancelCreatorAction()
+		}
 
-	function escapeAction(e: KeyboardEvent) {
-		if (e.key.toLocaleLowerCase() == 'escape') {
-			cancelAction()
+		if (e.key.toLowerCase() === ' ') {
+			if (isAnimPlaying) pauseAnimation()
+			else playAnimation()
+		}
+
+		if (e.key.toLowerCase() === 's') {
+			stopAnimation()
+		}
+
+		if ('0123456789'.includes(e.key)) {
+			keyboardSelectStep += e.key
+			selectStepDebouncer()
+		}
+
+		if (e.key.toLowerCase() === 'a') {
+			if (e.ctrlKey) {
+				e.preventDefault()
+				togglePlayOnlyCurSelAnim()
+			}
 		}
 	}
+
+	let keyboardSelectStep = ''
+	let selectStepDebouncer = debounce(()=> {
+		const idx = Number(keyboardSelectStep)
+		if (idx > 0 && idx <= $currentProjectStore.steps.length) {
+			$currentProject.selectStep(idx-1)
+		}
+		if (idx > $currentProjectStore.steps.length) {
+			console.log('not existing')
+		}
+		keyboardSelectStep = ''
+	}, 350)
 
 	function toggleAddStepMode() {
-		if (currentAction === CreatorAction.AddStep) {
-			cancelAction()
+		if ($currentAction === CreatorAction.AddStep) {
+			cancelCreatorAction()
 		}
-		else currentAction = CreatorAction.AddStep
+		else currentAction.set(CreatorAction.AddStep)
 	}
 
 	function toggleDeleteStepMode() {
-		if (currentAction === CreatorAction.DeleteStep) {
-			cancelAction()
+		if ($currentAction === CreatorAction.DeleteStep) {
+			cancelCreatorAction()
 		}
-		else currentAction = CreatorAction.DeleteStep
+		else currentAction.set(CreatorAction.DeleteStep)
+	}
+
+	function toggleChangeVpBg() {
+		if ($currentAction === CreatorAction.ChangeVpBg) {
+			cancelCreatorAction()
+		}
+		else currentAction.set(CreatorAction.ChangeVpBg)
 	}
 
 	function approveAnimDiscard() {
@@ -244,11 +302,6 @@
 			setTimeout(playAnimation)
 		}
 		animations.selectProject(prjIdx)
-	}
-
-	let showVpBgPicker = false
-	function toggleViewportBgPicker() {
-		showVpBgPicker = !showVpBgPicker
 	}
 
 	let _cachedTargetStyles: string = null
@@ -306,29 +359,31 @@
 					};`
 				)
 		
-				if (animationState === AnimationState.Playing) {
+				if (animationState === AnimationState.Playing && targetShadowDOM) {
 					const el: HTMLElement = targetShadowDOM.querySelector(
 						$currentProjectStore.targetEl
 					)
-					el.style.animationPlayState = 'running'
-					el.style.animationName = $.name
-					el.style.animationDuration = $.duration + 'ms'
-					el.style.animationDelay = $.delay + 'ms'
-					el.style.animationIterationCount = (
-						$.iterations === 0 ? 'infinite' : '' + $.iterations
-					)
-					if ($.fillMode !== AnimFillmode.None) {
-						el.style.animationFillMode = $.fillMode
-					} else {
-						el.style.animationFillMode = null
-					}
-					if ($.direction !== AnimDirection.None) {
-						el.style.animationDirection = $.direction
-					} else {
-						el.style.animationDirection = null
-					}
-					if ($.timingFunction !== '') {
-						el.style.animationTimingFunction = $.timingFunction
+					if (el) {
+						el.style.animationPlayState = 'running'
+						el.style.animationName = $.name
+						el.style.animationDuration = $.duration + 'ms'
+						el.style.animationDelay = $.delay + 'ms'
+						el.style.animationIterationCount = (
+							$.iterations === 0 ? 'infinite' : '' + $.iterations
+						)
+						if ($.fillMode !== AnimFillmode.None) {
+							el.style.animationFillMode = $.fillMode
+						} else {
+							el.style.animationFillMode = null
+						}
+						if ($.direction !== AnimDirection.None) {
+							el.style.animationDirection = $.direction
+						} else {
+							el.style.animationDirection = null
+						}
+						if ($.timingFunction !== '') {
+							el.style.animationTimingFunction = $.timingFunction
+						}
 					}
 				}
 			})
@@ -336,7 +391,10 @@
 	})
 </script>
 
-<svelte:window on:keydown={escapeAction} on:pointerup={windowPointerUp}/>
+<svelte:window
+	on:keydown={userKeyboardInput}
+	on:pointerup|passive={windowPointerUp}
+/>
 
 <main>
 	<header>
@@ -408,11 +466,11 @@
 
 			<div class='viewport-bg-picker'
 			class:transparent-bg={$animations.viewportBg === 'transparent'}>
-				<button on:click={toggleViewportBgPicker} class='btn has-icon'>
+				<button on:click={toggleChangeVpBg} class='btn has-icon'>
 					<div class='color-preview' style='background-color: {$animations.viewportBg};'/>
 					<span class='label'>Viewport Bg color</span>
 				</button>
-				{#if showVpBgPicker}
+				{#if $currentAction === CreatorAction.ChangeVpBg}
 					<div class='disclosure flex content-center gap-05' transition:colorPickerAnim>
 						<button class='set-transparent' on:click={()=> animations.setViewportBg('transparent')}>
 							<div class='color-preview'/>
@@ -506,13 +564,13 @@
 
 			<div class='steps flex gap-1 nowrap align-right'>
 				<button on:click={toggleAddStepMode}
-				class:pulse={!stepsExisting && currentAction !== CreatorAction.AddStep}
+				class:pulse={!stepsExisting && $currentAction !== CreatorAction.AddStep}
 				class='btn has-icon'>
 					<svg class='icon icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 						<path stroke='#4caf50' d='M12 4V20M4 12H20'/>
 					</svg>
 					<span class='label'>
-						{#if currentAction === CreatorAction.AddStep}
+						{#if $currentAction === CreatorAction.AddStep}
 							Cancel
 						{:else}
 							Add a step
@@ -527,7 +585,7 @@
 						<path stroke='#ff1744' d='M19 5L5 19M5 5L19 19'/>
 					</svg>
 					<span class='label'>
-						{#if currentAction === CreatorAction.DeleteStep}
+						{#if $currentAction === CreatorAction.DeleteStep}
 							Cancel
 						{:else}
 							Discard a step
@@ -541,8 +599,8 @@
 		bind:this={timelineEl}
 		on:click={timelineClick}
 		on:pointermove={timelinePointerMove}
-		class:add-mode={currentAction === CreatorAction.AddStep}
-		class:delete-mode={currentAction === CreatorAction.DeleteStep}>
+		class:add-mode={$currentAction === CreatorAction.AddStep}
+		class:delete-mode={$currentAction === CreatorAction.DeleteStep}>
 			<div class='percent-steps'>
 				{#each Array(100) as _}<div/>{/each}
 			</div>
@@ -576,7 +634,7 @@
 					style={`animation-play-state: ${playerCursorState};` + playerCursorStyles}
 				/>
 			</div>
-			{#if currentAction === CreatorAction.AddStep && movingStepPos !== null}
+			{#if $currentAction === CreatorAction.AddStep && movingStepPos !== null}
 				<div class='creation-pseudo-step'>
 					<div class='step flex content-center' style='left: {movingStepPos}%;'>
 						<span class='indicator'>{movingStepPos}%</span>
