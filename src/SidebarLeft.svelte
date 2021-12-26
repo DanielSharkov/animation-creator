@@ -56,7 +56,7 @@ let timingFuncSelection = false
 		<input type='text'
 			id='target-query-input'
 			value={$currentProjectStore.targetEl}
-			on:change={(e)=> $currentProject.targetChangeSelector(e.currentTarget.value)}
+			on:change={changeTargetElSelector}
 		/>
 		<label for='target-query-input'>
 			CSS selector for Element
@@ -68,7 +68,7 @@ let timingFuncSelection = false
 			id='animation-name'
 			type='text'
 			value={$currentProjectStore.name}
-			on:change={changeTargetElSelector}
+			on:change={(e)=> $currentProject.changeName(e.currentTarget.value)}
 		/>
 		<label for='animation-name'>Name</label>
 	</div>
