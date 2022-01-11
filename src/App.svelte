@@ -1,6 +1,6 @@
 <script context='module' lang='ts'>
 	export enum CreatorAction {
-		None, AddStep, DeleteStep, ChangeVpBg, PrjTimeFn,
+		None, AddStep, DeleteStep, ChangeVpBg, PrjTimeFn, StepTimeFn,
 	}
 	export const currentAction = writable(CreatorAction.None)
 
@@ -95,8 +95,8 @@
 			} else {
 				el.style.animationDirection = null
 			}
-			if (prjStr.timingFunction !== '') {
-				el.style.animationTimingFunction = prjStr.timingFunction
+			if (prjStr.timingFunc !== '') {
+				el.style.animationTimingFunction = prjStr.timingFunc
 			}
 		}
 	}
@@ -327,7 +327,7 @@
 					const html = $animations.target.html
 					const styles = (
 						$animations.target.css +'\n'+
-						renderAllKeyframeStyles($animations.projects) +'\n'+
+						renderAllKeyframeStyles($animations.projects, true) +'\n'+
 						buildCursorKeyframeStyle($.steps) +'\n'+
 						($.selectedStep === null ? '' : selectedKeyframeStyle(
 							$.targetEl,
@@ -352,7 +352,7 @@
 				}
 				playerCursorStyles = (
 					`animation-direction: ${$.direction};` +
-					`animation-timing-function: ${$.timingFunction};` +
+					`animation-timing-function: ${$.timingFunc};` +
 					`animation-duration: ${$.duration}ms;` +
 					`animation-iteration-count: ${
 						$.iterations > 0 ? $.iterations : 'infinite'
@@ -381,8 +381,8 @@
 						} else {
 							el.style.animationDirection = null
 						}
-						if ($.timingFunction !== '') {
-							el.style.animationTimingFunction = $.timingFunction
+						if ($.timingFunc !== '') {
+							el.style.animationTimingFunction = $.timingFunc
 						}
 					}
 				}

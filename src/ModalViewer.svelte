@@ -171,7 +171,7 @@ const modalAnim =(node, o?)=> ({
 							</svg>
 						</button>
 					</div>
-					<textarea readonly rows='16'>{buildProjects($animations.projects)}</textarea>
+					<textarea readonly rows='16'>{buildProjects($animations.projects, true)}</textarea>
 				</div>
 			</div>
 

@@ -1,41 +1,88 @@
 import {Readable, writable, get as getStore, Updater} from 'svelte/store'
 
-export const EasingFunctions = [
-	{name: 'Linear',       value: 'linear'},
-	{name: 'Steps',        value: 'steps(10, end)'},
-
-	{name: 'Sine In',      value: 'cubic-bezier(0.12, 0, 0.39, 0)'},
-	{name: 'Sine Out',     value: 'cubic-bezier(0.37, 0, 0.63, 1)'},
-	{name: 'Sine In/Out',  value: 'cubic-bezier(0.61, 1, 0.88, 1)'},
-
-	{name: 'Cubic In',     value: 'cubic-bezier(0.32, 0, 0.67, 0)'},
-	{name: 'Cubic Out',    value: 'cubic-bezier(0.33, 1, 0.68, 1)'},
-	{name: 'Cubic In/Out', value: 'cubic-bezier(0.65, 0, 0.35, 1)'},
-
-	{name: 'Quint In',     value: 'cubic-bezier(0.64, 0, 0.78, 0)'},
-	{name: 'Quint Out',    value: 'cubic-bezier(0.22, 1, 0.36, 1)'},
-	{name: 'Quint In/Out', value: 'cubic-bezier(0.83, 0, 0.17, 1)'},
-
-	{name: 'Circ In',      value: 'cubic-bezier(0.55, 0, 1, 0.45)'},
-	{name: 'Circ Out',     value: 'cubic-bezier(0, 0.55, 0.45, 1)'},
-	{name: 'Circ In/Out',  value: 'cubic-bezier(0.85, 0, 0.15, 1)'},
-
-	{name: 'Quad In',      value: 'cubic-bezier(0.11, 0, 0.5, 0)'},
-	{name: 'Quad Out',     value: 'cubic-bezier(0.5, 1, 0.89, 1)'},
-	{name: 'Quad In/Out',  value: 'cubic-bezier(0.45, 0, 0.55, 1)'},
-
-	{name: 'Quart In',     value: 'cubic-bezier(0.5, 0, 0.75, 0)'},
-	{name: 'Quart Out',    value: 'cubic-bezier(0.25, 1, 0.5, 1)'},
-	{name: 'Quart In/Out', value: 'cubic-bezier(0.76, 0, 0.24, 1)'},
-
-	{name: 'Expo In',      value: 'cubic-bezier(0.7, 0, 0.84, 0)'},
-	{name: 'Expo Out',     value: 'cubic-bezier(0.16, 1, 0.3, 1)'},
-	{name: 'Expo In/Out',  value: 'cubic-bezier(0.87, 0, 0.13, 1)'},
-
-	{name: 'Back In',      value: 'cubic-bezier(0.36, 0, 0.66, -0.56)'},
-	{name: 'Back Out',     value: 'cubic-bezier(0.34, 1.56, 0.64, 1)'},
-	{name: 'Back In/Out',  value: 'cubic-bezier(0.68, -0.6, 0.32, 1.6)'},
-]
+export const EasingFunctions = {
+	default: {
+		name: 'Default',
+		options: [
+			{name: 'Linear', value: 'linear'},
+		],
+	},
+	steps: {
+		name: 'Steps',
+		options: [
+			{name: 'Jump Start', value: 'steps(10, jump-start)'},
+			{name: 'Jump End',   value: 'steps(10, jump-end)'},
+			{name: 'Jump None',  value: 'steps(10, jump-none)'},
+			{name: 'Jump Both',  value: 'steps(10, jump-both)'},
+			{name: 'Start',      value: 'steps(10, start)'},
+			{name: 'End',        value: 'steps(10, end)'},
+		],
+	},
+	sine: {
+		name: 'Sine',
+		options: [
+			{name: 'In',     value: 'cubic-bezier(0.12, 0, 0.39, 0)'},
+			{name: 'Out',    value: 'cubic-bezier(0.37, 0, 0.63, 1)'},
+			{name: 'In/Out', value: 'cubic-bezier(0.61, 1, 0.88, 1)'},
+		],
+	},
+	cubic: {
+		name: 'Cubic',
+		options: [
+			{name: 'In',     value: 'cubic-bezier(0.32, 0, 0.67, 0)'},
+			{name: 'Out',    value: 'cubic-bezier(0.33, 1, 0.68, 1)'},
+			{name: 'In/Out', value: 'cubic-bezier(0.65, 0, 0.35, 1)'},
+		],
+	},
+	quint: {
+		name: 'Quint',
+		options: [
+			{name: 'In',     value: 'cubic-bezier(0.64, 0, 0.78, 0)'},
+			{name: 'Out',    value: 'cubic-bezier(0.22, 1, 0.36, 1)'},
+			{name: 'In/Out', value: 'cubic-bezier(0.83, 0, 0.17, 1)'},
+		],
+	},
+	circ: {
+		name: 'Circ',
+		options: [
+			{name: 'In',     value: 'cubic-bezier(0.55, 0, 1, 0.45)'},
+			{name: 'Out',    value: 'cubic-bezier(0, 0.55, 0.45, 1)'},
+			{name: 'In/Out', value: 'cubic-bezier(0.85, 0, 0.15, 1)'},
+		],
+	},
+	quad: {
+		name: 'Quad',
+		options: [
+			{name: 'In',     value: 'cubic-bezier(0.11, 0, 0.5, 0)'},
+			{name: 'Out',    value: 'cubic-bezier(0.5, 1, 0.89, 1)'},
+			{name: 'In/Out', value: 'cubic-bezier(0.45, 0, 0.55, 1)'},
+		],
+	},
+	quart: {
+		name: 'Quart',
+		options: [
+			{name: 'In',     value: 'cubic-bezier(0.5, 0, 0.75, 0)'},
+			{name: 'Out',    value: 'cubic-bezier(0.25, 1, 0.5, 1)'},
+			{name: 'In/Out', value: 'cubic-bezier(0.76, 0, 0.24, 1)'},
+		],
+	},
+	expo: {
+		name: 'Expo',
+		options: [
+			{name: 'In',     value: 'cubic-bezier(0.7, 0, 0.84, 0)'},
+			{name: 'Out',    value: 'cubic-bezier(0.16, 1, 0.3, 1)'},
+			{name: 'In/Out', value: 'cubic-bezier(0.87, 0, 0.13, 1)'},
+		],
+	},
+	back: {
+		name: 'Back',
+		options: [
+			{name: 'In',     value: 'cubic-bezier(0.36, 0, 0.66, -0.56)'},
+			{name: 'Out',    value: 'cubic-bezier(0.34, 1.56, 0.64, 1)'},
+			{name: 'In/Out', value: 'cubic-bezier(0.68, -0.6, 0.32, 1.6)'},
+		],
+	},
+}
 
 export type T_AnimationCreator = {
 	curPrj:     number,
@@ -70,20 +117,19 @@ export class AnimationCreator implements Readable<T_AnimationCreator> {
 					$.viewportBg = json.viewportBg
 					return $
 				})
-			}
-			const prjsLocStr = localStorage.getItem(LocStr_Projects)
-			if (prjsLocStr) {
-				this.#store.update(($)=> {
-					for (const preset of JSON.parse(prjsLocStr)) {
-						$.projects.push(new AnimationProject(preset))
-					}
-					return $
-				})
+				const prjsLocStr = localStorage.getItem(LocStr_Projects)
+				if (prjsLocStr) {
+					this.#store.update(($)=> {
+						for (const preset of JSON.parse(prjsLocStr)) {
+							$.projects.push(new AnimationProject(preset))
+						}
+						return $
+					})
+				}
 			}
 		}
 
 		if (notInited) { // init examples
-			console.log('initing examples')
 			this.#store.update(($)=> {
 				$.target.html = `\<div id='TestBall'\>\</div\>\n\<div id='TestBall2'\>\</div\>`
 				$.target.css = (
@@ -111,7 +157,7 @@ export class AnimationCreator implements Readable<T_AnimationCreator> {
 					{pos: 50, styles: `background-color: green;\ntransform: translateY(100%) scale(1.5);`},
 					{pos: 100, styles: `background-color: blue;\ntransform: translateY(0);`},
 				],
-				timingFunction: EasingFunctions[7].value,
+				timingFunc: EasingFunctions['cubic'].options[2].value,
 			})
 			this.newProject({
 				name: 'ball_2',
@@ -121,7 +167,7 @@ export class AnimationCreator implements Readable<T_AnimationCreator> {
 					{pos: 50, styles: `background-color: purple;\ntransform: translateX(50%) rotate(45deg) scale(1.5);`},
 					{pos: 100, styles: `background-color: red;\ntransform: translateY(0);`},
 				],
-				timingFunction: EasingFunctions[12].value,
+				timingFunc: EasingFunctions['circ'].options[1].value,
 			})
 			this.selectProject(0)
 		}
@@ -246,8 +292,9 @@ export enum AnimDirection {
 }
 
 export type AnimStep = {
-	pos:    number // Percentage position
-	styles: string
+	pos:         number // Percentage position
+	styles:      string
+	timingFunc?: string
 }
 
 export type T_AnimationProject = {
@@ -255,7 +302,7 @@ export type T_AnimationProject = {
 	duration:            number
 	stepsRelativeToTime: boolean
 	delay:               number
-	timingFunction:      string
+	timingFunc:          string
 	iterations:          number // 0 == infinite
 	fillMode:            AnimFillmode
 	direction:           AnimDirection
@@ -269,7 +316,7 @@ export interface AnimationProjectPreset {
 	duration?:            number
 	stepsRelativeToTime?: boolean
 	delay?:               number
-	timingFunction?:      string
+	timingFunc?:          string
 	iterations?:          number // 0 == infinite
 	fillMode?:            AnimFillmode
 	direction?:           AnimDirection
@@ -284,7 +331,7 @@ export class AnimationProject implements Readable<T_AnimationProject> {
 		duration: 1000,
 		stepsRelativeToTime: false,
 		delay: 0,
-		timingFunction: 'linear',
+		timingFunc: 'linear',
 		iterations: 0,
 		fillMode: AnimFillmode.None,
 		direction: AnimDirection.None,
@@ -305,8 +352,8 @@ export class AnimationProject implements Readable<T_AnimationProject> {
 			if (preset.delay) {
 				$.delay = preset.delay
 			}
-			if (preset.timingFunction) {
-				$.timingFunction = preset.timingFunction
+			if (preset.timingFunc) {
+				$.timingFunc = preset.timingFunc
 			}
 			if (preset.iterations) {
 				$.iterations = preset.iterations
@@ -357,7 +404,7 @@ export class AnimationProject implements Readable<T_AnimationProject> {
 
 	changeTimingFunc(fn: string) {
 		this.#store.update(($)=> {
-			$.timingFunction = fn
+			$.timingFunc = fn
 			return $
 		})
 	}
@@ -390,6 +437,13 @@ export class AnimationProject implements Readable<T_AnimationProject> {
 			return $
 		})
 		return returnVal
+	}
+
+	changeStepTimingFunc(fn?: string) {
+		this.#store.update(($)=> {
+			$.steps[$.selectedStep].timingFunc = fn
+			return $
+		})
 	}
 
 	updateStepStyles(css: string) {
@@ -439,7 +493,6 @@ export class AnimationProject implements Readable<T_AnimationProject> {
 
 	changeStepPosByTime(time: number) {
 		this.#store.update(($)=> {
-			console.log(time, $.duration, time >= 0, time <= $.duration)
 			if (time >= 0 && time <= $.duration) {
 				$.steps[$.selectedStep].pos = 100 / $.duration * time
 			}
@@ -454,9 +507,9 @@ export class AnimationProject implements Readable<T_AnimationProject> {
 		})
 	}
 
-	targetChangeSelector(code: string) {
+	targetChangeSelector(selector: string) {
 		this.#store.update(($)=> {
-			$.targetEl = code
+			$.targetEl = selector
 			return $
 		})
 	}

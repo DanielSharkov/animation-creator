@@ -27,8 +27,6 @@ function changeTargetElSelector(e: Event & {currentTarget: EventTarget & HTMLInp
 		e.currentTarget.value = $currentProjectStore.targetEl
 	}
 }
-
-let timingFuncSelection = false
 </script>
 
 
@@ -197,22 +195,31 @@ let timingFuncSelection = false
 			<h1>Timing Functions</h1>
 		</div>
 
-		<div class='options grid gap-05'>
+		<div class='options grid gap-1'>
 			<div class='input-field'>
 				<input type='text'
 					id='custom-timing-func'
-					value={$currentProjectStore.timingFunction}
+					value={$currentProjectStore.timingFunc}
 					on:change={(e)=> $currentProject.changeTimingFunc(e.currentTarget.value)}
 				/>
 				<label for='custom-timing-func'>Customize timing function</label>
 			</div>
 
-			{#each EasingFunctions as easeFn}
-				<button on:click={()=> $currentProject.changeTimingFunc(easeFn.value)}
-				class:active={$currentProjectStore.timingFunction === easeFn.value}
-				class='btn even-pdg'>
-					<span class='name'>{easeFn.name}</span>
-				</button>
+			{#each Object.keys(EasingFunctions) as easeGroupID}
+				<div class='group grid gap-05'>
+					<span class='name'>
+						{EasingFunctions[easeGroupID].name}
+					</span>
+					<div class='options flex gap-05'>
+						{#each EasingFunctions[easeGroupID].options as easeFn}
+							<button on:click={()=> $currentProject.changeTimingFunc(easeFn.value)}
+							class:active={$currentProjectStore.timingFunc === easeFn.value}
+							class='btn even-pdg'>
+								<span class='name'>{easeFn.name}</span>
+							</button>
+						{/each}
+					</div>
+				</div>
 			{/each}
 		</div>
 	</div>
@@ -239,25 +246,4 @@ let timingFuncSelection = false
 	padding: .5em
 	background-color: #ffff00
 	color: var(--bg)
-
-.timing-func-panel
-	z-index: 10
-	position: absolute
-	top: 0
-	left: 0
-	width: 100%
-	min-height: 100%
-	background-color: var(--bg)
-	padding: 1rem
-	align-content: start
-	.options
-		font-size: 1.1em
-		> .input-field
-			margin-bottom: 1rem
-		> button
-			&.active
-				box-shadow: 0 0 20px var(--prime-05)
-				background-color: var(--prime)
-				border-color: var(--prime)
-				color: var(--bg)
 </style>

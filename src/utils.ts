@@ -27,10 +27,10 @@ export function indentCode(code: string, step = 1) {
 
 	let str = ''
 	let idx = 0
-	const codeLines = code.split('\n')
-	for (const line of codeLines) {
-		str += indent + line
-		if (idx+1 < codeLines.length) {
+	const cssRules = parseCssRules(code)
+	for (const rule of Object.keys(cssRules)) {
+		str += `${indent}${rule}: ${cssRules[rule]};`
+		if (idx+1 < Object.keys(cssRules).length) {
 			str += '\n'
 		}
 		idx++
@@ -46,12 +46,12 @@ export function wrapInTags(tagName: string, val: string) {
 	)
 }
 
-export function renderAllKeyframeStyles(prjs: AnimationProject[]) {
+export function renderAllKeyframeStyles(prjs: AnimationProject[], isExport = false) {
 	let css = ''
 	let idx = 0
 	for (const prj of prjs) {
 		const $ = getStore(prj)
-		css += buildKeyframeStyle($.name, $.steps)
+		css += buildKeyframeStyle($.name, $.steps, isExport)
 		if (idx+1 < prjs.length) {
 			css += '\n\n'
 		}
@@ -60,11 +60,17 @@ export function renderAllKeyframeStyles(prjs: AnimationProject[]) {
 	return css
 }
 
-export function buildKeyframeStyle(name: string, steps: Array<AnimStep>) {
+export function buildKeyframeStyle(name: string, steps: Array<AnimStep>, isExport = false) {
 	let css = `@keyframes ${name} {\n`
 	for (const step of steps) {
 		if (step.styles === '') continue
-		css += `\t${step.pos}% {\n${indentCode(step.styles, 2)}\n\t}\n`
+		let code = step.styles
+		if (step.timingFunc && isExport) {
+			code += (
+				'animation-timing-function: ' + step.timingFunc + ';\n'
+			)
+		}
+		css += `\t${step.pos}% {\n${indentCode(code, 2)}\n\t}\n`
 	}
 	return css + '}'
 }
@@ -90,15 +96,15 @@ function toDurationUnit(duration: number) {
 	return duration / 1000 +'s'
 }
 
-export function buildProjects(prjs: AnimationProject[]) {
+export function buildProjects(prjs: AnimationProject[], isExport = false) {
 	let css = ''
 	let idx = 0
 	for (const prj of prjs) {
 		const $ = getStore(prj)
 
 		const ruleProps = [$.name, toDurationUnit($.duration)]
-		if ($.timingFunction !== '') {
-			ruleProps.push($.timingFunction)
+		if ($.timingFunc !== '') {
+			ruleProps.push($.timingFunc)
 		}
 		if ($.delay > 0) {
 			ruleProps.push(toDurationUnit($.delay))
@@ -114,7 +120,7 @@ export function buildProjects(prjs: AnimationProject[]) {
 		}
 		css += `animation: ${ruleProps.join(' ')};\n`
 
-		css += buildKeyframeStyle($.name, $.steps)
+		css += buildKeyframeStyle($.name, $.steps, isExport)
 		if (idx+1 < prjs.length) {
 			css += '\n\n'
 		}
@@ -129,6 +135,50 @@ export function copyToClipboard(str: string) {
 	}
 }
 
+export function parseCssRules(code: string) {
+	const rules: {[rule: string]: string} = {}
+	let currentRule: string|null = null
+	let cursor = 0
+	for (let idx = 0; idx < code.length; idx++) {
+		const char = code[idx]
+		if (char === ':') {
+			currentRule = code.slice(cursor, idx).trim()
+			cursor = idx+1
+		}
+		if (char === ';') {
+			rules[currentRule] = code.slice(cursor, idx).trim()
+			currentRule = null
+			cursor = idx+1
+		}
+		if (idx === code.length-1 && currentRule !== null) {
+			rules[currentRule] = code.slice(cursor, idx).trim()
+		}
+	}
+	return rules
+}
+
+export function extractCssRules(code: string) {
+	const rulesObj = parseCssRules(code)
+	let timeFn: string
+	let serializedCode = ''
+	let idx = 0
+	for (const rule of Object.keys(rulesObj)) {
+		switch (rule) {
+			case 'animation-timing-function':
+				timeFn = rulesObj[rule]
+				delete rulesObj[rule]
+				break
+			default:
+				serializedCode += `${rule}: ${rulesObj[rule]};`
+		}
+		if (idx < Object.keys(rulesObj).length - 1) {
+			serializedCode += '\n'
+		}
+		idx++
+	}
+	return {timeFn, serializedCode}
+}
+
 export function parseCssImport(css: string) {
 	const projects: AnimationProjectPreset[] = []
 	const nameMap: {[name: string]: number} = {}
@@ -136,7 +186,7 @@ export function parseCssImport(css: string) {
 	let inKeyframeName = false
 	let currentCodeBlock: null|string = null
 	let currentStepPos: null|number = null
-	let isCurrentStepBlock = false
+	let currentStepBlockCursor: null|number = null
 	let isAnimPresets = false
 
 	function curPrj(name: string) {
@@ -197,7 +247,7 @@ export function parseCssImport(css: string) {
 				// )
 			}
 			if (timeFunc) {
-				curPrj(animName).timingFunction = timeFunc
+				curPrj(animName).timingFunc = timeFunc
 			}
 			for (const prop of props) {
 				// tailing space
@@ -263,7 +313,7 @@ export function parseCssImport(css: string) {
 						`Duplicate timing function linear, "${timeFunc}" ` +
 						`is already defined.`
 					)
-					curPrj(animName).timingFunction = prop
+					curPrj(animName).timingFunc = prop
 					continue
 				}
 
@@ -276,18 +326,30 @@ export function parseCssImport(css: string) {
 		}
 		// parsing @keyframes block
 		else if (currentCodeBlock !== null) {
-			if (isCurrentStepBlock) {
-				if (char !== '}') continue
-				curPrj(currentCodeBlock).steps.push({
-					pos: currentStepPos,
-					styles: css.slice(cursor, idx).replace(/\t/g, '').trim(),
-				})
-				isCurrentStepBlock = false
-				currentStepPos = null
-				cursor = idx+1
-			}
-			else if (char === '}') {
-				currentCodeBlock = null
+			if (currentStepBlockCursor !== null) {
+				if (char === '}') {
+					const stepCss = extractCssRules(css.slice(currentStepBlockCursor, idx + 1))
+					curPrj(currentCodeBlock).steps.push({
+						timingFunc: stepCss.timeFn,
+						pos: currentStepPos,
+						styles: stepCss.serializedCode,
+					})
+					currentStepBlockCursor = null
+					currentStepPos = null
+					cursor = idx+1
+				}
+				// else if (char === ';') {
+				// 	if (
+				// 		'animation-timing-function:' ===
+				// 		css.slice(currentStepBlockCursor, currentStepBlockCursor + 29).trim()
+				// 	) {
+				// 		curPrj(currentCodeBlock).timingFunc = (
+				// 			css.slice(currentStepBlockCursor + 29, idx).trim()
+				// 		)
+				// 	}
+				// 	cursor = idx+1
+				// }
+				continue
 			}
 			else if (char === '{') {
 				if (currentStepPos !== null) {
@@ -307,8 +369,11 @@ export function parseCssImport(css: string) {
 					)
 				}
 				currentStepPos = pos
-				isCurrentStepBlock = true
 				cursor = idx+1
+				currentStepBlockCursor = cursor
+			}
+			else if (char === '}') {
+				currentCodeBlock = null
 			}
 		}
 		// parsing @keyframes name
@@ -357,13 +422,13 @@ export function parseCssImport(css: string) {
 		inKeyframeName ||
 		currentCodeBlock !== null ||
 		currentStepPos !== null ||
-		isCurrentStepBlock ||
+		currentStepBlockCursor !== null ||
 		isAnimPresets
 	) {
 		console.log('inKeyframeName:', inKeyframeName)
 		console.log('currentCodeBlock:', currentCodeBlock)
 		console.log('currentStepPos:', currentStepPos)
-		console.log('isCurrentStepBlock:', isCurrentStepBlock)
+		console.log('currentStepBlockCursor:', currentStepBlockCursor)
 		console.log('isAnimPresets:', isAnimPresets)
 		throw new Error('Invaid CSS, unable to parse.')
 	}
