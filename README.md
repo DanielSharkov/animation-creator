@@ -7,10 +7,10 @@ This app is pretty much self explained by intuitive design, so it doesn't requir
 ⌨ Keyboard shortcuts:
 | Action | Key combination *(universal / macOS)* |
 |:-|:-|
-| Play/Pause animation | `Spacebar` |
-| Stop animation | `S` |
-| Toggle play all animations | `Ctrl + A` / `⌘ + A` |
-| Select a keyframe | Use `0`-`9` to select a keyframe by index. Use key sequences for multi-digit numbers (`1` + `2` + `3` = `123`) |
+| Play/Pause animation | <kbd>Spacebar</kbd> |
+| Stop animation | <kbd>S</kbd> |
+| Toggle play all animations | <kbd>Ctrl</kbd> + <kbd>A</kbd> / <kbd>⌘</kbd> + <kbd>A</kbd> |
+| Select a keyframe | Use <kbd>0</kbd>-<kbd>9</kbd> to select a keyframe by index. Use key sequences for multi-digit numbers (<kbd>1</kbd> + <kbd>2</kbd> + <kbd>3</kbd> = `123`) |
 
 If you would like to fork this project and adjust the code your needs, just clone it,
 install all dependencies by `npm i` and finally run `npm run dev` -
