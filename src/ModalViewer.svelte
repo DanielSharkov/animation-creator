@@ -75,6 +75,7 @@ function parseImport() {
 	try {
 		parsedImport = null
 		parsedImport = parseCssImport(importCode)
+		importErr = null
 	}
 	catch(err) {
 		importErr = err
