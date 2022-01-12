@@ -2,6 +2,7 @@
 export enum Modals {
 	None, Target, Export, Import, DiscardAnim,
 	ImportKeepOrDiscard, DiscardWholeProject,
+	Settings,
 }
 let opendModal = writable(Modals.None)
 
@@ -26,6 +27,7 @@ export function closeModal() {
 			Modals.Import,
 			Modals.DiscardAnim,
 			Modals.DiscardWholeProject,
+			Modals.Settings,
 		].includes(
 			$opendModal
 		)) {
@@ -37,6 +39,7 @@ export function closeModal() {
 
 
 <script lang='ts'>
+import {appSettings, AppTheming, setAppTheming, toggleBgBluring, toggleElRounding} from './App.svelte'
 import {buildProjects, copyToClipboard, parseCssImport} from './utils'
 import type {AnimationProjectPreset} from './animation_creator'
 import {createEventDispatcher} from 'svelte'
@@ -120,11 +123,8 @@ const modalAnim =(node, o?)=> ({
 			</div>
 
 			<div class='actions flex content-center-y'>
-				<button on:click={closeModal} class='btn has-icon align-right'>
-					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-						<path d='M19 5L5 19M5 5L19 19'/>
-					</svg>
-					<span class='label'>Close</span>
+				<button on:click={closeModal} class='btn align-right'>
+					Close
 				</button>
 			</div>
 		</div>
@@ -176,11 +176,8 @@ const modalAnim =(node, o?)=> ({
 			</div>
 
 			<div class='actions flex content-center-y'>
-				<button on:click={closeModal} class='btn has-icon align-right'>
-					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-						<path d='M19 5L5 19M5 5L19 19'/>
-					</svg>
-					<span class='label'>Close</span>
+				<button on:click={closeModal} class='btn align-right'>
+					Close
 				</button>
 			</div>
 		</div>
@@ -235,15 +232,15 @@ const modalAnim =(node, o?)=> ({
 
 			<div class='actions flex content-center-y'>
 				<button on:click={closeModal} class='btn has-icon'>
-					<svg class='icon icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-						<path stroke='#ff1744' d='M19 5L5 19M5 5L19 19'/>
+					<svg class='icon stroke icon-15 clr-red' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+						<path d='M19 5L5 19M5 5L19 19'/>
 					</svg>
 					<span class='label'>Cancel</span>
 				</button>
 
 				<button on:click={importAskToKeepState} class='btn has-icon align-right' disabled={parsedImport === null}>
-					<svg class='icon icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-						<path stroke='#4caf50' stroke-width='2' d='M4 11.5L9.5 17L19.5 7'/>
+					<svg class='icon stroke icon-15 clr-green' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+						<path stroke-width='2' d='M4 11.5L9.5 17L19.5 7'/>
 					</svg>
 					<span class='label'>Apply</span>
 				</button>
@@ -254,8 +251,8 @@ const modalAnim =(node, o?)=> ({
 	{#if $opendModal === Modals.DiscardAnim}
 		<div class='modal discard-anim' transition:modalAnim>
 			<div class='header flex content-center-y gap-1'>
-				<svg class='icon icon-3' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-					<path stroke='#ffff00' d='M12 9V16M12 3L2 21H22L12 3ZM12 17.5L11.5 18L12 18.5L12.5 18L12 17.5Z'/>
+				<svg class='icon stroke icon-3 icon-warn' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+					<path d='M12 9V16M12 3L2 21H22L12 3ZM12 17.5L11.5 18L12 18.5L12.5 18L12 17.5Z'/>
 				</svg>
 				<h1>Discard Animation</h1>
 			</div>
@@ -264,17 +261,14 @@ const modalAnim =(node, o?)=> ({
 
 			<div class='actions flex content-center-y'>
 				<button on:click={()=> dispatch('approveAnimDiscard')} class='discard btn has-icon'>
-					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+					<svg class='icon stroke icon-15 clr-red' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 						<path d='M18 4.8V20.8H6V4.8M9 7.6L9 18M12 7.6L12 18M15 7.6L15 18M4 4.8L8.00002 4.8M8.00002 4.8L16 4.8M8.00002 4.8L10 3L14 3L16 4.8M16 4.8L20 4.8'/>
 					</svg>
 					<span class='label'>Discard</span>
 				</button>
 
-				<button on:click={closeModal} class='cancel btn has-icon align-right'>
-					<svg class='icon icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-						<path stroke='#4caf50' d='M19 5L5 19M5 5L19 19'/>
-					</svg>
-					<span class='label'>Keep</span>
+				<button on:click={closeModal} class='cancel btn align-right'>
+					Keep
 				</button>
 			</div>
 		</div>
@@ -283,8 +277,8 @@ const modalAnim =(node, o?)=> ({
 	{#if $opendModal === Modals.DiscardWholeProject}
 		<div class='modal discard-projects' transition:modalAnim>
 			<div class='header flex content-center-y gap-1'>
-				<svg class='icon icon-3' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-					<path stroke='#ffff00' d='M12 9V16M12 3L2 21H22L12 3ZM12 17.5L11.5 18L12 18.5L12.5 18L12 17.5Z'/>
+				<svg class='icon stroke icon-3 icon-warn' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+					<path d='M12 9V16M12 3L2 21H22L12 3ZM12 17.5L11.5 18L12 18.5L12.5 18L12 17.5Z'/>
 				</svg>
 				<h1>Discard everything</h1>
 			</div>
@@ -293,17 +287,14 @@ const modalAnim =(node, o?)=> ({
 
 			<div class='actions flex content-center-y'>
 				<button on:click={()=> dispatch('discardAllProjects')} class='discard btn has-icon'>
-					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+					<svg class='icon stroke icon-15 clr-red' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 						<path d='M18 4.8V20.8H6V4.8M9 7.6L9 18M12 7.6L12 18M15 7.6L15 18M4 4.8L8.00002 4.8M8.00002 4.8L16 4.8M8.00002 4.8L10 3L14 3L16 4.8M16 4.8L20 4.8'/>
 					</svg>
 					<span class='label'>Discard</span>
 				</button>
 
-				<button on:click={closeModal} class='cancel btn has-icon align-right'>
-					<svg class='icon icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-						<path stroke='#4caf50' d='M19 5L5 19M5 5L19 19'/>
-					</svg>
-					<span class='label'>Keep</span>
+				<button on:click={closeModal} class='cancel btn align-right'>
+					Keep
 				</button>
 			</div>
 		</div>
@@ -321,18 +312,73 @@ const modalAnim =(node, o?)=> ({
 			<p>Do you want to keep or discard the current animation projects?</p>
 
 			<div class='actions flex content-center-y'>
-				<button on:click={applyImport} class='discard btn has-icon'>
-					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+				<button on:click={()=> applyImport(false)} class='discard btn has-icon'>
+					<svg class='icon stroke icon-15 clr-red' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 						<path d='M18 4.8V20.8H6V4.8M9 7.6L9 18M12 7.6L12 18M15 7.6L15 18M4 4.8L8.00002 4.8M8.00002 4.8L16 4.8M8.00002 4.8L10 3L14 3L16 4.8M16 4.8L20 4.8'/>
 					</svg>
 					<span class='label'>Discard</span>
 				</button>
 
 				<button on:click={()=> applyImport(true)} class='cancel btn has-icon align-right'>
-					<svg class='icon icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-						<path stroke='#4caf50' d='M19 5L5 19M5 5L19 19'/>
-					</svg>
 					<span class='label'>Keep</span>
+				</button>
+			</div>
+		</div>
+	{/if}
+
+	{#if $opendModal === Modals.Settings}
+		<div class='modal settings' transition:modalAnim>
+			<div class='header flex content-center-y gap-1'>
+				<svg class='icon stroke icon-3' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+					<path stroke-linejoin='bevel' d='M10.3636 6.90909V2.5H12H13.6364V6.90909L14.4837 7.26879L18.0848 3.79187L20.2081 5.91524L16.7312 9.51634L17.0909 10.3636H21.5V12V13.6364H17.0909L16.7478 14.5001L20.3733 17.9196L17.9196 20.3733L14.5001 16.7478L13.6364 17.0909V21.5H12H10.3636V17.0909L9.4999 16.7478L6.08042 20.3733L3.62669 17.9196L7.25216 14.5001L6.90909 13.6364H2.5V12V10.3636H6.90909L7.26879 9.51634L3.79187 5.91524L5.91524 3.79187L9.51634 7.26879L10.3636 6.90909Z'/>
+					<circle cx='12' cy='12' r='2.5'/>
+				</svg>
+				<h1>Settings</h1>
+			</div>
+
+			<div class='field grid gap-05'>
+				<span class='label'>Theming</span>
+				<div class='options btn-group'>
+					<button on:click={()=> setAppTheming(AppTheming.System)}
+					class:active={$appSettings.theme === AppTheming.System}>
+						System
+					</button>
+					<button on:click={()=> setAppTheming(AppTheming.Light)}
+					class:active={$appSettings.theme === AppTheming.Light}>
+						Light
+					</button>
+					<button on:click={()=> setAppTheming(AppTheming.Dark)}
+					class:active={$appSettings.theme === AppTheming.Dark}>
+						Dark
+					</button>
+				</div>
+			</div>
+
+			<div class='field'>
+				<button on:click={toggleElRounding} class='btn has-icon'>
+					<div class='checkbox flex content-center' class:active={$appSettings.elRounding}>
+						<svg viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+							<path d='M 4 11, l 5 4, l 8 -10' stroke-width='2'/>
+						</svg>
+					</div>
+					<span class='label'>Elements rounding</span>
+				</button>
+			</div>
+
+			<div class='field'>
+				<button on:click={toggleBgBluring} class='btn has-icon'>
+					<div class='checkbox flex content-center' class:active={$appSettings.bluring}>
+						<svg viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+							<path d='M 4 11, l 5 4, l 8 -10' stroke-width='2'/>
+						</svg>
+					</div>
+					<span class='label'>Background bluring (performance impact)</span>
+				</button>
+			</div>
+
+			<div class='actions flex content-center-y'>
+				<button on:click={closeModal} class='close btn align-right'>
+					Close
 				</button>
 			</div>
 		</div>
@@ -350,7 +396,7 @@ const modalAnim =(node, o?)=> ({
 	bottom: 0
 	left: 0
 	padding: 2rem
-	background-color: rgba(#222, .75)
+	background-color: var(--modal-viewport-bg)
 	justify-content: center
 	overflow: auto
 	transition-duration: .3s
@@ -366,9 +412,10 @@ const modalAnim =(node, o?)=> ({
 		align-content: start
 		grid-gap: 1rem
 		padding: 2rem
-		border: solid 1px var(--border)
-		background-color: var(--bg)
-		box-shadow: 0 10px 40px #000
+		border: var(--modal-border)
+		background-color: var(--modal-bg)
+		box-shadow: var(--modal-shadow)
+		border-radius: var(--modal-radius)
 		.header
 			margin-bottom: 1rem
 			h1
@@ -386,33 +433,37 @@ const modalAnim =(node, o?)=> ({
 	.modal.import
 	.modal.discard-anim,
 	.import-keep-or-discard,
-	.discard-projects
+	.discard-projects,
+	.modal.settings
 		max-width: 600px
 	.modal.export > .body > .field > .label
 		font-size: 1.25em
 		color: var(--prime)
-	.modal.discard-anim .actions > .discard,
-	.modal.import-keep-or-discard .actions > .discard,
-	.modal.discard-projects .actions > .discard
-		color: #ff1744
+
+:global(html[bg-bluring] #ModalViewport)
+	-webkit-backdrop-filter: blur(6px)
+	backdrop-filter: blur(6px)
 
 .import-info
 	code
 		padding: .2em .5em
-		background-color: rgba(#fff, .15)
+		background-color: var(--fg)
+		border-radius: var(--btn-radius)
 	ol
 		padding-left: 1.5em
 		li::marker
 			color: var(--prime)
 	pre
 		padding: .5em
-		background-color: #151515
+		background-color: var(--fg)
 		border: solid 1px var(--border)
+		border-radius: var(--btn-radius)
 		opacity: .75
 
 .import-error
 	padding: 1em
-	background-color: rgba(#ff1744, .25)
-	border: solid 1px #ff1744
+	background-color: var(--clr-red-025)
+	border: solid 1px var(--clr-red)
+	border-radius: var(--btn-radius)
 	color: var(--heading)
 </style>

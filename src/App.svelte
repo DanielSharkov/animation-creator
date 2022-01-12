@@ -7,6 +7,96 @@ export const currentAction = writable(CreatorAction.None)
 export function cancelCreatorAction() {
 	currentAction.set(CreatorAction.None)
 }
+
+export enum AppTheming {
+	System = 'sys',
+	Light = 'light',
+	Dark = 'dark',
+}
+type T_AppSettings = {
+	theme:      AppTheming
+	elRounding: boolean
+	bluring:    boolean
+}
+
+const LocStr_Settings = 'git@github.com:DanielSharkov/animation-creator__settings'
+const AppSettings = writable<T_AppSettings>({
+	theme:      AppTheming.System,
+	elRounding: false,
+	bluring:    false,
+})
+export const appSettings = AppSettings
+
+function _updateSettings(f: Updater<T_AppSettings>) {
+	AppSettings.update(($)=> {
+		$ = f($)
+		if ('localStorage' in window) {
+			localStorage.setItem(LocStr_Settings, JSON.stringify($))
+		}
+		return $
+	})
+}
+
+function syncSettingsFromLocStr() {
+	if ('localStorage' in window) {
+		// Get data and sync store
+		const locStr = localStorage.getItem(LocStr_Settings)
+		if (locStr !== null) {
+			AppSettings.update(($)=> {
+				$ = JSON.parse(locStr) as T_AppSettings
+				return $
+			})
+		}
+
+		// Apply to DOM
+		const $ = getStore(AppSettings)
+
+		document.documentElement.setAttribute('theme', $.theme)
+
+		if ($.elRounding) {
+			document.documentElement.setAttribute('el-rounding', 'true')
+		}
+
+		if ($.bluring) {
+			document.documentElement.setAttribute('bg-bluring', 'true')
+		}
+	}
+}
+syncSettingsFromLocStr()
+
+export function setAppTheming(theming: AppTheming) {
+	_updateSettings(($)=> {
+		$.theme = theming
+		document.documentElement.setAttribute('theme', $.theme)
+		return $
+	})
+}
+
+export function toggleElRounding() {
+	_updateSettings(($)=> {
+		$.elRounding = !$.elRounding
+		if ($.elRounding) {
+			document.documentElement.setAttribute('el-rounding', 'true')
+		}
+		else {
+			document.documentElement.removeAttribute('el-rounding')
+		}
+		return $
+	})
+}
+
+export function toggleBgBluring() {
+	_updateSettings(($)=> {
+		$.bluring = !$.bluring
+		if ($.bluring) {
+			document.documentElement.setAttribute('bg-bluring', 'true')
+		}
+		else {
+			document.documentElement.removeAttribute('bg-bluring')
+		}
+		return $
+	})
+}
 </script>
 
 
@@ -15,7 +105,7 @@ export function cancelCreatorAction() {
 import {onMount} from 'svelte'
 import {AnimationCreator, AnimStep, AnimDirection, AnimFillmode} from './animation_creator'
 import {cubicInOut} from 'svelte/easing'
-import {derived, get as getStore, Unsubscriber, writable} from 'svelte/store'
+import {derived, get as getStore, Unsubscriber, Updater, writable} from 'svelte/store'
 import {renderAllKeyframeStyles, buildCursorKeyframeStyle, wrapInTags, selectedKeyframeStyle, debounce} from './utils'
 import ModalViewer, {closeModal, Modals, openModal} from './ModalViewer.svelte'
 import SidebarLeft from './SidebarLeft.svelte'
@@ -402,6 +492,7 @@ animations.subscribe(()=> {
 			<div class='tabs flex nowrap'>
 				{#each $animations.projects as prj, prjIdx}
 					<button on:click={()=> changeProject(prjIdx)}
+					class='tab'
 					class:active={prjIdx === $animations.curPrj}>
 						{#if prjIdx === $animations.curPrj}
 							{$currentProjectStore.name}
@@ -495,6 +586,13 @@ animations.subscribe(()=> {
 					<path d='M18 4.8V20.8H6V4.8M9 7.6L9 18M12 7.6L12 18M15 7.6L15 18M4 4.8L8.00002 4.8M8.00002 4.8L16 4.8M8.00002 4.8L10 3L14 3L16 4.8M16 4.8L20 4.8'/>
 				</svg>
 				<span class='label'>Discard everything</span>
+			</button>
+
+			<button on:click={()=> openModal(Modals.Settings)} class='btn even-pdg'>
+				<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+					<path stroke-linejoin='bevel' d='M10.3636 6.90909V2.5H12H13.6364V6.90909L14.4837 7.26879L18.0848 3.79187L20.2081 5.91524L16.7312 9.51634L17.0909 10.3636H21.5V12V13.6364H17.0909L16.7478 14.5001L20.3733 17.9196L17.9196 20.3733L14.5001 16.7478L13.6364 17.0909V21.5H12H10.3636V17.0909L9.4999 16.7478L6.08042 20.3733L3.62669 17.9196L7.25216 14.5001L6.90909 13.6364H2.5V12V10.3636H6.90909L7.26879 9.51634L3.79187 5.91524L5.91524 3.79187L9.51634 7.26879L10.3636 6.90909Z'/>
+					<circle cx='12' cy='12' r='2.5'/>
+				</svg>
 			</button>
 
 			<button on:click={()=> showSidebarRight = !showSidebarRight} class='btn even-pdg align-right'>

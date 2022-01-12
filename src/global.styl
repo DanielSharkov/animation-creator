@@ -4,18 +4,93 @@ rgbVar(name)
 rgbaVar(name, opa = 1)
 	s("rgba(var(%s), %s)", name, opa)
 
-html
+html // default theming - light
+	--bg: #fff
+	--fg: #eee
+	--border: #ccc
+	--font: #333
+	--heading: #000
 	--trans-ease: cubic-bezier(.4, 0, .2, 1)
 
-	--prime-rgb: 64, 196, 255
+	--prime-rgb: 41, 121, 255
 	--prime: rgbVar(--prime-rgb)
 	--prime-01: rgbaVar(--prime-rgb, .1)
 	--prime-05: rgbaVar(--prime-rgb, .5)
+
+	--clr-red-rgb: 255, 23, 68
+	--clr-red: rgbVar(--clr-red-rgb)
+	--clr-red-025: rgbaVar(--clr-red-rgb, .25)
+
+	--clr-green-rgb: 76, 175, 80
+	--clr-green: rgbVar(--clr-green-rgb)
+
+	--clr-blue-rgb: 68, 138, 255
+	--clr-blue: rgbVar(--clr-blue-rgb)
+
+	--clr-yellow-rgb: 255, 238, 88
+	--clr-yellow: rgbVar(--clr-yellow-rgb)
+
+	--transparent-bg-preview: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cg fill='%23aaa' fill-opacity='1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E")
+	--transparent-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cg fill='%23eee' fill-opacity='1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E")
+
+	--disclosure-shadow: 0 0 20px rgba(#000, .25)
+	--tabs-unselected: #f9f9f9
+	--tabs-empty-space: #f0f0f0
+
+	--modal-viewport-bg: rgba(#000, .35)
+	--modal-bg: var(--bg)
+	--modal-radius: 0
+	--modal-border: solid 1px var(--border)
+	--modal-shadow: 0 10px 40px rgba(#000, .3)
+
+	--timeline-seperator: rgba(#000, .15)
+	--timeline-step-font: var(--font)
+	--timeline-step-hover-shadow: 0 0 50px rgba(#000, .75)
+	--timeline-step-radius: 0
+	--timeline-step-selected-font: var(--bg)
+	--timeline-step-ignore-shadow: 0 0 10px rgba(#000, .15)
+	--timeline-creation-pseudo-step: rgba(#000, .15)
+
+	--btn-radius: 0
+	--btn-bg: transparent
+	--btn-font: var(--font)
+	--btn-border: var(--border)
+	--btn-shadow: none
+	--btn-H-bg: rgba(#000, .15)
+	--btn-H-font: var(--heading)
+	--btn-H-border: #000
+	--btn-H-shadow: 0 0 20px rgba(#000, .15)
+	--btn-A-bg: #151515
+	--btn-A-font: #fff
+	--btn-A-border: var(--heading)
+	--btn-A-shadow: 0 0 20px rgba(#000, .35)
+
+$themingDark = @block {
 	--bg: #000
 	--fg: #151515
 	--border: #333
 	--font: #bbb
 	--heading: #fff
+
+	--prime-rgb: 64, 196, 255
+
+	--clr-yellow-rgb: 255, 255, 0
+
+	--transparent-bg-preview: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cg fill='%23666' fill-opacity='1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E")
+	--transparent-bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cg fill='%23111' fill-opacity='1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E")
+
+	--disclosure-shadow: 0 0 20px #000
+	--tabs-unselected: #1a1a1a
+	--tabs-empty-space: #111
+
+	--modal-viewport-bg: rgba(#222, .75)
+	--modal-shadow: 0 10px 40px #000
+
+	--timeline-seperator: rgba(#fff, .1)
+	--timeline-step-hover-shadow: 0 0 50px rgba(#000, .75)
+	--timeline-step-ignore-shadow: 0 0 10px rgba(#fff, .15)
+	--timeline-creation-pseudo-step: rgba(#fff, .25)
+
 	--btn-bg: transparent
 	--btn-font: var(--font)
 	--btn-border: var(--border)
@@ -28,6 +103,19 @@ html
 	--btn-A-font: var(--bg)
 	--btn-A-border: var(--heading)
 	--btn-A-shadow: 0 0 20px rgba(#fff, .5)
+}
+
+html[theme='dark']
+	{$themingDark}
+
+@media (prefers-color-scheme: dark)
+	html[theme='sys']
+		{$themingDark}
+
+html[el-rounding]
+	--btn-radius: .25rem
+	--modal-radius: .5rem
+	--timeline-step-radius: .15rem
 
 html, body
 	width: 100%
@@ -80,13 +168,18 @@ button.btn, select
 	border: solid 1px var(--btn-border)
 	background-color: var(--btn-bg)
 	box-shadow: 0 0 0 2px var(--bg) inset
+	border-radius: var(--btn-radius)
 	color: var(--btn-font)
 	&:hover
 		border-color: var(--btn-H-border)
 		background-color: var(--btn-H-bg)
 		box-shadow: var(--btn-H-shadow)
 		color: var(--btn-H-font)
-	&:active, &:focus
+	&:focus
+		box-shadow:
+			0 0 0 1px var(--bg) inset,
+			0 0 0 3px inset var(--font)
+	&:active
 		border-color: var(--btn-A-border)
 		background-color: var(--btn-A-bg)
 		box-shadow: var(--btn-A-shadow)
@@ -107,20 +200,14 @@ button.btn, select
 .btn-group
 	position: relative
 	display: flex
+	padding: .1rem
 	flex-flow: row wrap
 	border: solid 1px var(--btn-border)
+	border-radius: var(--btn-radius)
 	background-color: var(--btn-bg)
 	color: var(--btn-font)
-	&:after
-		z-index: 1
-		content: ''
-		position: absolute
-		top: 0
-		right: 0
-		bottom: 0
-		left: 0
-		pointer-events: none
 	> button
+		position: relative
 		display: flex
 		flex-flow: row nowrap
 		gap: .5em
@@ -129,13 +216,25 @@ button.btn, select
 		color: inherit
 		flex: 1 1 auto
 		padding: .5em
+		border-radius: var(--btn-radius)
+		&:not(:last-child):after
+			content: ''
+			z-index: -1
+			position: absolute
+			right: 0
+			height: 50%
+			border-right: solid 1px var(--border)
 		&:not(:last-child)
 			border-right: solid 1 var(--btn-border)
 		&:hover
 			border-color: var(--btn-H-border)
 			background-color: var(--btn-H-bg)
 			color: var(--btn-H-font)
-		&:active, &:focus
+		&:focus
+			box-shadow:
+				0 0 0 1px var(--bg) inset,
+				0 0 0 3px inset var(--font)
+		&:active
 			border-color: var(--btn-A-border)
 			background-color: var(--btn-A-bg)
 			box-shadow: var(--btn-A-shadow)
@@ -145,6 +244,11 @@ button.btn, select
 			background-color: var(--prime)
 			box-shadow: 0 0 20px var(--prime-05)
 			color: var(--btn-A-font)
+		&.active:focus
+			box-shadow:
+				0 0 20px var(--prime-05),
+				0 0 0 2px var(--bg) inset,
+				0 0 0 4px inset var(--font)
 
 select option
 	font-size: 1.1em
@@ -213,9 +317,9 @@ select option
 		gap: 2rem
 
 .icon
-	&.stroke
+	&.stroke, > .stroke
 		stroke: currentColor
-	&.fill
+	&.fill, > .fill
 		fill: currentColor
 	&.icon-1
 		width: 1em
@@ -229,6 +333,17 @@ select option
 	&.icon-3
 		width: 3em
 		height: 3em
+	&.clr-red
+		color: var(--clr-red)
+	&.clr-green
+		color: var(--clr-green)
+	&.clr-blue
+		color: var(--clr-blue)
+	&.clr-yellow
+		color: var(--clr-yellow)
+	&.icon-warn > *
+		stroke: #000
+		fill: var(--clr-yellow)
 
 h1, h2, h3, h4, h5, h6
 	font-family: inherit
@@ -246,6 +361,7 @@ input, textarea
 	padding: .5em
 	border: solid 1px var(--border)
 	tab-size: 2em
+	border-radius: var(--btn-radius)
 	&:hover
 		border-color: var(--heading)
 		&+ label
@@ -271,6 +387,7 @@ input, textarea
 	transition-duration: .2s
 	transition-property: background-color, border-color
 	will-change: background-color, border-color
+	border-radius: var(--btn-radius)
 	> svg
 		width: 1em
 		height: 1em
@@ -289,14 +406,16 @@ input, textarea
 			stroke-dasharray: 21
 
 header
+	z-index: 21
 	flex: 0 0 auto
 	width: 100%
 	border-bottom: solid 1px var(--border)
+	background-color: var(--bg)
 	.tab-bar
 		.tabs
 			flex: 1 1 auto
 			overflow-x: auto
-			> button
+			> .tab
 				flex: 0 1 auto
 				padding: .25em .75em
 				border: none
@@ -306,22 +425,27 @@ header
 				box-shadow: none
 				white-space: nowrap
 				&:not(.active)
-					background-color: #111
+					background-color: var(--tabs-unselected)
 				&:hover, &:focus
-					background-color: #333
+					border-top-color: var(--heading)
+					background-color: var(--bg)
 				&.active
 					background-color: var(--bg)
 					border-top-color: var(--prime)
 					border-bottom-color: transparent
-				&.new-project
-					&:hover
-						color: #4caf50
-					&:active, &:focus
-						background-color: #4caf50
-						color: var(--bg)
+			> .new-project
+				padding: 0 .5em
+				background-color: var(--tabs-unselected)
+				border-right: solid 1px var(--border)
+				border-top: solid 2px transparent
+				border-bottom: solid 1px var(--border)
+				&:hover, &:active, &:focus
+					background-color: var(--clr-green)
+					color: var(--bg)
 			.empty-space
 				flex: 1 1 0
 				border-bottom: solid 1px var(--border)
+				background-color: var(--tabs-empty-space)
 		.options
 			flex: 0 0 auto
 			border-bottom: solid 1px var(--border)
@@ -332,13 +456,11 @@ header
 				box-shadow: none
 				&.export
 					font-size: 1.1em
-					color: #4caf50
 					&:hover, &:focus
-						background-color: #4caf50
+						background-color: var(--clr-green)
 						color: var(--bg)
 				&.import
 					font-size: 1.1em
-					color: var(--prime)
 					&:hover, &:focus
 						background-color: var(--prime)
 						color: var(--bg)
@@ -355,7 +477,7 @@ header
 				background-size: .75rem
 				background-repeat: repeat
 				background-position: center
-				background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cg fill='%23666' fill-opacity='1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E")
+				background-image: var(--transparent-bg-preview)
 			.set-transparent .color-preview
 				width: 3rem
 				height: 3rem
@@ -366,7 +488,8 @@ header
 				padding: 1rem
 				background-color: var(--bg)
 				border: solid 1px var(--border)
-				box-shadow: 0 0 20px #000
+				box-shadow: var(--disclosure-shadow)
+				border-radius: var(--modal-radius)
 				&:before
 					content: ''
 					position: absolute
@@ -377,7 +500,7 @@ header
 					height: 1rem
 					background-color: var(--bg)
 					border: solid 1px
-					border-color: var(--border) #000 #000 var(--border)
+					border-color: var(--border) var(--bg) var(--bg) var(--border)
 					transform: rotate(45deg)
 				.input-wrapper
 					position: relative
@@ -436,12 +559,14 @@ header
 	&.transparent-bg #AnimationTarget
 		background-size: 1rem
 		background-position: center
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cg fill='%23111' fill-opacity='1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E")
+		background-image: var(--transparent-bg)
 
 #AnimationSteps
+	z-index: 20
 	border-top: solid 1px var(--border)
 	flex: 0 0 auto
 	padding: .5rem
+	background-color: var(--bg)
 	.controls
 		padding: 1rem
 		button.pulse
@@ -464,7 +589,7 @@ header
 			width: 1%
 			height: 100%
 			&:not(:first-child)
-				border-left: solid 1px rgba(#fff, .1)
+				border-left: solid 1px var(--timeline-seperator)
 		.duration-steps
 			box-shadow: 0 0 0 2px var(--bg) inset
 			> div
@@ -508,9 +633,10 @@ header
 					box-shadow: 0 0 0 1px var(--bg)
 					background-color: var(--bg)
 					border: solid 1px var(--font)
-					color: var(--font)
+					color: var(--timeline-step-font)
 					writing-mode: vertical-rl
 					text-overflow: ellipsis
+					border-radius: var(--timeline-step-radius)
 					overflow: hidden
 					@supports (-webkit-backdrop-filter: blur(1px))
 						left: 50%
@@ -525,7 +651,7 @@ header
 					padding: .25em .5em
 					font-size: .85em
 					background-color: var(--bg)
-					box-shadow: 0 0 10px rgba(#fff, .15)
+					box-shadow: var(--timeline-step-ignore-shadow)
 					white-space: nowrap
 					line-height: 1.5
 					pointer-events: none
@@ -539,7 +665,7 @@ header
 					z-index: 100
 					background-color: var(--heading)
 					.indicator
-						box-shadow: 0 0 0 1px var(--bg), 0 0 50px rgba(#fff, .75)
+						box-shadow: 0 0 0 1px var(--bg), var(--timeline-step-hover-shadow)
 						background-color: var(--heading)
 						color: var(--bg)
 				&.selected
@@ -548,7 +674,8 @@ header
 					.indicator
 						box-shadow: 0 0 0 1px var(--bg), 0 0 50px var(--prime)
 						background-color: var(--prime)
-						color: #000
+						border-color: var(--prime)
+						color: var(--timeline-step-selected-font)
 			&.moving
 				cursor: move !important
 				.step
@@ -559,13 +686,14 @@ header
 			top: 0
 			bottom: 0
 			width: 1%
-			background-color: rgba(#fff, .25)
+			background-color: var(--timeline-creation-pseudo-step)
 			transform: translateX(-50%)
 			.indicator
 				position: absolute
 				height: 50%
 				box-shadow: 0 0 0 2px var(--bg)
 				background-color: var(--prime)
+				border-radius: var(--timeline-step-radius)
 				color: var(--bg)
 				writing-mode: vertical-rl
 				text-align: center
@@ -615,6 +743,7 @@ header
 	min-height: 100%
 	background-color: var(--bg)
 	padding: 1rem
+	box-shadow: var(--disclosure-shadow)
 	align-content: start
 	.options
 		font-size: 1.1em

@@ -168,9 +168,9 @@ function changeTargetElSelector(e: Event & {currentTarget: EventTarget & HTMLInp
 
 	<button on:click={()=> currentAction.set(CreatorAction.PrjTimeFn)} class='btn has-icon flex'>
 		<svg class='icon icon-2' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-			<path fill='#fff' d='M3 1L1.55662 3.5L4.44338 3.5L3 1ZM3 21L2.75 21L2.75 21.25L3 21.25L3 21ZM23 21L20.5 19.5566L20.5 22.4434L23 21ZM2.75 3.25L2.75 21L3.25 21L3.25 3.25L2.75 3.25ZM3 21.25L20.75 21.25L20.75 20.75L3 20.75L3 21.25Z'/>
+			<path class='fill' d='M3 1L1.55662 3.5L4.44338 3.5L3 1ZM3 21L2.75 21L2.75 21.25L3 21.25L3 21ZM23 21L20.5 19.5566L20.5 22.4434L23 21ZM2.75 3.25L2.75 21L3.25 21L3.25 3.25L2.75 3.25ZM3 21.25L20.75 21.25L20.75 20.75L3 20.75L3 21.25Z'/>
 			<path fill='url(#paint0_linear_1552_25)' d='M3.5 20L3.5 20.5L4.5 20.5L4.5 20L3.5 20ZM20.5 4V3.5H19.5V4H20.5ZM4.5 20C4.5 17.1317 5.44511 15.5412 6.8 14.525C8.20385 13.4721 10.0962 12.9913 12.1213 12.4851C14.0962 11.9913 16.2038 11.4721 17.8 10.275C19.4451 9.04117 20.5 7.13172 20.5 4H19.5C19.5 6.86828 18.5549 8.45883 17.2 9.475C15.7962 10.5279 13.9038 11.0087 11.8787 11.5149C9.9038 12.0087 7.79615 12.5279 6.2 13.725C4.55489 14.9588 3.5 16.8683 3.5 20L4.5 20Z'/>
-			<path opacity='0.5' d='M5 3H21V19' stroke='#fff' stroke-dasharray='1 1'/>
+			<path class='stroke' opacity='0.5' d='M5 3H21V19' stroke-dasharray='1 1'/>
 			<defs>
 				<linearGradient id='paint0_linear_1552_25' x1='12' y1='3' x2='12' y2='21' gradientUnits='userSpaceOnUse'>
 					<stop stop-color='#15DF66'/>
@@ -232,18 +232,19 @@ function changeTargetElSelector(e: Event & {currentTarget: EventTarget & HTMLInp
 .header
 	.discard
 		&:hover
-			box-shadow: 0 0 20px #ff1744
-			background-color: #ff174430
-			border-color: #ff1744
-			color: #ff1744
+			box-shadow: 0 0 20px var(--clr-red)
+			background-color: var(--clr-red-025)
+			border-color: var(--clr-red)
+			color: var(--clr-red)
 		&:active, &:focus
-			box-shadow: 0 0 20px #ff1744
-			background-color: #ff1744
-			border-color: #ff1744
-			color: var(--heading)
+			box-shadow: 0 0 20px var(--clr-red)
+			background-color: var(--clr-red)
+			border-color: var(--clr-red)
+			color: #fff
 
 .selector-search-not-found
 	padding: .5em
-	background-color: #ffff00
-	color: var(--bg)
+	border-radius: var(--btn-radius)
+	background-color: var(--clr-yellow)
+	color: #000
 </style>
