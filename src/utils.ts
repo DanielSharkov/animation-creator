@@ -250,7 +250,7 @@ export function parseCssImport(css: string) {
 				curPrj(animName).timingFunc = timeFunc
 			}
 			for (const prop of props) {
-				// tailing space
+				// trailing space
 				if (prop === '') continue
 
 				// is fill-mode
@@ -338,17 +338,6 @@ export function parseCssImport(css: string) {
 					currentStepPos = null
 					cursor = idx+1
 				}
-				// else if (char === ';') {
-				// 	if (
-				// 		'animation-timing-function:' ===
-				// 		css.slice(currentStepBlockCursor, currentStepBlockCursor + 29).trim()
-				// 	) {
-				// 		curPrj(currentCodeBlock).timingFunc = (
-				// 			css.slice(currentStepBlockCursor + 29, idx).trim()
-				// 		)
-				// 	}
-				// 	cursor = idx+1
-				// }
 				continue
 			}
 			else if (char === '{') {
@@ -360,7 +349,10 @@ export function parseCssImport(css: string) {
 
 				let strPos = css.slice(cursor, idx).trim()
 				if (strPos === 'from') strPos = '0%'
-				if (strPos === 'to') strPos = '100%'
+				else if (strPos === 'to') strPos = '100%'
+				else if (strPos.indexOf('%') < 0) {
+					break // panic, invalid position
+				}
 				const pos = Number(strPos.slice(0, strPos.length-1)) // remove %
 
 				if (Number.isNaN(pos)) {
