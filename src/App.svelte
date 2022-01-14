@@ -479,12 +479,36 @@ animations.subscribe(()=> {
 		})
 	})
 })
+
+let viewportWidthQuery = matchMedia('(max-width: 800px)')
+let viewportHeightQuery = matchMedia('(max-height: 300px)')
+
+let isMobileWidth = viewportWidthQuery.matches
+let isMobileHeight = viewportHeightQuery.matches
+$:isMobileSize = isMobileWidth || isMobileHeight
+
+viewportWidthQuery.addEventListener('change', ()=> {
+	isMobileWidth = viewportWidthQuery.matches
+}, {passive: true})
+viewportHeightQuery.addEventListener('change', ()=> {
+	isMobileHeight = viewportHeightQuery.matches
+}, {passive: true})
 </script>
 
 <svelte:window
 	on:keydown={userKeyboardInput}
 	on:pointerup|passive={windowPointerUp}
 />
+
+{#if isMobileSize}
+<div id='MobileSupportMsg'>
+	<h1>Sorry 📵</h1>
+	<p>
+		Keyframer is designed to work best on bigger screens.
+		There are no plans to support screens smaller than 800x300.
+	</p>
+</div>
+{/if}
 
 <main>
 	<header>

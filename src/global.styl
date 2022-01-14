@@ -153,7 +153,7 @@ body
 main
 	display: flex
 	height: 100%
-	flex-flow: column wrap
+	flex-flow: column nowrap
 
 button, select, label[for], input[type=color]
 	cursor: pointer
@@ -763,3 +763,16 @@ header
 					background-color: var(--prime)
 					border-color: var(--prime)
 					color: var(--bg)
+
+#MobileSupportMsg
+	z-index: 999
+	position: fixed
+	top: 0
+	right: 0
+	bottom: 0
+	left: 0
+	padding: 2rem
+	background-color: var(--bg)
+	text-align: center
+	h1
+		margin-bottom: .5em
