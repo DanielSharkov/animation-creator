@@ -64,6 +64,7 @@ html // default theming - light
 	--btn-A-font: #fff
 	--btn-A-border: var(--heading)
 	--btn-A-shadow: 0 0 20px rgba(#000, .35)
+	--btn-prime-A-shadow: 0 2px 4px rgba(#000, .25), 0 0 20px var(--prime-05)
 
 $themingDark = @block {
 	--bg: #000
@@ -198,6 +199,7 @@ button.btn, select
 			padding: .15em
 
 .btn-group
+	z-index: 0
 	position: relative
 	display: flex
 	padding: .1rem
@@ -242,13 +244,17 @@ button.btn, select
 		&.active
 			border-color: var(--btn-A-border)
 			background-color: var(--prime)
-			box-shadow: 0 0 20px var(--prime-05)
+			box-shadow: var(--btn-prime-A-shadow)
 			color: var(--btn-A-font)
 		&.active:focus
 			box-shadow:
-				0 0 20px var(--prime-05),
+				var(--btn--prime-A-shadow),
 				0 0 0 2px var(--bg) inset,
 				0 0 0 4px inset var(--font)
+
+a.link
+	&:hover
+		color: var(--prime)
 
 select option
 	font-size: 1.1em
@@ -411,6 +417,13 @@ header
 	width: 100%
 	border-bottom: solid 1px var(--border)
 	background-color: var(--bg)
+	.app-logo
+		padding: .5em
+		border-bottom: solid 1px var(--border)
+		border-right: solid 1px var(--border)
+		img
+			width: 2rem
+			height: 2rem
 	.tab-bar
 		.tabs
 			flex: 1 1 auto
@@ -463,6 +476,10 @@ header
 					font-size: 1.1em
 					&:hover, &:focus
 						background-color: var(--prime)
+						color: var(--bg)
+				&.settings
+					&:hover, &:focus
+						background-color: var(--font)
 						color: var(--bg)
 	.project-options
 		padding: .5em

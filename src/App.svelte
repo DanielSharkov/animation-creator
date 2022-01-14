@@ -319,9 +319,9 @@ let selectStepDebouncer = debounce(()=> {
 	if (idx > 0 && idx <= $currentProjectStore.steps.length) {
 		$currentProject.selectStep(idx-1)
 	}
-	if (idx > $currentProjectStore.steps.length) {
-		console.log('not existing')
-	}
+	// if (idx > $currentProjectStore.steps.length) {
+	// 	console.log('not existing')
+	// }
 	keyboardSelectStep = ''
 }, 350)
 
@@ -513,6 +513,10 @@ viewportHeightQuery.addEventListener('change', ()=> {
 <main>
 	<header>
 		<div class='tab-bar flex nowrap'>
+			<button class='app-logo flex content-center' on:click={()=> openModal(Modals.AboutApp)}>
+				<img src='app-icon/ico-64.png' alt='Logo'>
+			</button>
+
 			<div class='tabs flex nowrap'>
 				{#each $animations.projects as prj, prjIdx}
 					<button on:click={()=> changeProject(prjIdx)}
@@ -542,13 +546,20 @@ viewportHeightQuery.addEventListener('change', ()=> {
 					</svg>
 					<span class='label'>Import</span>
 				</button>
-	
+
 				<button on:click={()=> openModal(Modals.Export)} class='export flex content-center gap-05'>
 					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 						<path d='M20 8V22H4V2H12M20 8H12V2M20 8L12 2M12 11V19M12 19L9 16M12 19L15 16'/>
 					</svg>
 					
 					<span class='label'>Export</span>
+				</button>
+
+				<button on:click={()=> openModal(Modals.Settings)} class='settings flex content-center'>
+					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+						<path stroke-linejoin='bevel' d='M10.3636 6.90909V2.5H12H13.6364V6.90909L14.4837 7.26879L18.0848 3.79187L20.2081 5.91524L16.7312 9.51634L17.0909 10.3636H21.5V12V13.6364H17.0909L16.7478 14.5001L20.3733 17.9196L17.9196 20.3733L14.5001 16.7478L13.6364 17.0909V21.5H12H10.3636V17.0909L9.4999 16.7478L6.08042 20.3733L3.62669 17.9196L7.25216 14.5001L6.90909 13.6364H2.5V12V10.3636H6.90909L7.26879 9.51634L3.79187 5.91524L5.91524 3.79187L9.51634 7.26879L10.3636 6.90909Z'/>
+						<circle cx='12' cy='12' r='2.5'/>
+					</svg>
 				</button>
 			</div>
 		</div>
@@ -610,13 +621,6 @@ viewportHeightQuery.addEventListener('change', ()=> {
 					<path d='M18 4.8V20.8H6V4.8M9 7.6L9 18M12 7.6L12 18M15 7.6L15 18M4 4.8L8.00002 4.8M8.00002 4.8L16 4.8M8.00002 4.8L10 3L14 3L16 4.8M16 4.8L20 4.8'/>
 				</svg>
 				<span class='label'>Discard everything</span>
-			</button>
-
-			<button on:click={()=> openModal(Modals.Settings)} class='btn even-pdg'>
-				<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-					<path stroke-linejoin='bevel' d='M10.3636 6.90909V2.5H12H13.6364V6.90909L14.4837 7.26879L18.0848 3.79187L20.2081 5.91524L16.7312 9.51634L17.0909 10.3636H21.5V12V13.6364H17.0909L16.7478 14.5001L20.3733 17.9196L17.9196 20.3733L14.5001 16.7478L13.6364 17.0909V21.5H12H10.3636V17.0909L9.4999 16.7478L6.08042 20.3733L3.62669 17.9196L7.25216 14.5001L6.90909 13.6364H2.5V12V10.3636H6.90909L7.26879 9.51634L3.79187 5.91524L5.91524 3.79187L9.51634 7.26879L10.3636 6.90909Z'/>
-					<circle cx='12' cy='12' r='2.5'/>
-				</svg>
 			</button>
 
 			<button on:click={()=> showSidebarRight = !showSidebarRight} class='btn even-pdg align-right'>
