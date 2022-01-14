@@ -252,8 +252,12 @@ function windowPointerUp(e: PointerEvent) {
 
 function timelinePointerMove(e: PointerEvent) {
 	if (movingStepIdx !== null || $currentAction === CreatorAction.AddStep) {
+		let pointerPos = e.clientX - 25
+		if (pointerPos > this.offsetWidth) {
+			pointerPos = this.offsetWidth
+		}
 		movingStepPos = (
-			Number((100 / timelineEl.clientWidth * e.offsetX).toFixed(0))
+			Number((100 / timelineEl.clientWidth * pointerPos).toFixed(0))
 		)
 	}
 }

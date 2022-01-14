@@ -584,6 +584,7 @@ header
 	flex: 0 0 auto
 	padding: .5rem
 	background-color: var(--bg)
+	user-select: none
 	.controls
 		padding: 1rem
 		button.pulse
@@ -714,6 +715,10 @@ header
 				color: var(--bg)
 				writing-mode: vertical-rl
 				text-align: center
+				@supports (-webkit-backdrop-filter: blur(1px))
+					left: 50%
+					top: 50%
+					transform: translate(-60%, -50%)
 		&.add-mode
 			animation: .45s borderPulseAdd infinite alternate linear
 			cursor: crosshair
