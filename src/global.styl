@@ -411,6 +411,33 @@ input, textarea
 			stroke: var(--bg)
 			stroke-dasharray: 21
 
+#ModalViewport .modal
+	display: grid
+	width: 100%
+	margin: auto
+	grid-auto-columns: 100%
+	align-content: start
+	grid-gap: 1rem
+	padding: 2rem
+	border: var(--modal-border)
+	background-color: var(--modal-bg)
+	box-shadow: var(--modal-shadow)
+	border-radius: var(--modal-radius)
+	.header
+		margin-bottom: 1rem
+		h1
+			font-weight: 400
+	.actions
+		margin-top: 1rem
+	textarea
+		font-size: .85em
+		padding: 1em
+		background-color: rgba(#fff, .1)
+		resize: vertical
+		white-space: pre
+	&.fixed-width
+		max-width: 600px
+
 header
 	z-index: 21
 	flex: 0 0 auto

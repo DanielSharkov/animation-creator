@@ -1,11 +1,11 @@
 <script lang='ts'>
 import {AnimationProject, AnimDirection, AnimFillmode, EasingFunctions} from './animation_creator'
 import {cubicOut} from 'svelte/easing'
-import {Modals} from './ModalViewer.svelte'
-import {cancelCreatorAction, CreatorAction, currentAction} from './App.svelte'
+import animations, {cancelCreatorAction, CreatorAction, currentAction} from './App.svelte'
+import {openModal} from './ModalViewer.svelte'
+import ModalDiscard from './modals/Discard.svelte'
 
 export let sidebarAnim
-export let openModal
 export let doesAnimTargetElExist: boolean
 export let currentProject: SvelteStore<AnimationProject>
 export let currentProjectStore
@@ -27,6 +27,21 @@ function changeTargetElSelector(e: Event & {currentTarget: EventTarget & HTMLInp
 		e.currentTarget.value = $currentProjectStore.targetEl
 	}
 }
+
+function discardAnim() {
+	openModal({
+		comp: ModalDiscard,
+		props: {
+			title: 'Discard Animation',
+			msg: 'Are you sure you wan\'t to discard this animation?',
+			discard: (closeModal)=> {
+				animations.discardProject()
+				closeModal()
+			},
+			keep: (closeModal)=> closeModal(),
+		},
+	})
+}
 </script>
 
 
@@ -35,7 +50,7 @@ function changeTargetElSelector(e: Event & {currentTarget: EventTarget & HTMLInp
 	<div class='header flex nowrap content-center-y gap-05'>
 		<h1>Animtion Settings</h1>
 
-		<button on:click={()=> openModal(Modals.DiscardAnim)} class='discard btn even-pdg small align-right'>
+		<button on:click={discardAnim} class='discard btn even-pdg small align-right'>
 			<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 				<path d='M18 4.8V20.8H6V4.8M9 7.6L9 18M12 7.6L12 18M15 7.6L15 18M4 4.8L8.00002 4.8M8.00002 4.8L16 4.8M8.00002 4.8L10 3L14 3L16 4.8M16 4.8L20 4.8'/>
 			</svg>

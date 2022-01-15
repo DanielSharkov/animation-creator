@@ -3,10 +3,11 @@ export enum CreatorAction {
 	None, AddStep, DeleteStep, ChangeVpBg, PrjTimeFn, StepTimeFn,
 }
 export const currentAction = writable(CreatorAction.None)
-
 export function cancelCreatorAction() {
 	currentAction.set(CreatorAction.None)
 }
+
+export const animations = new AnimationCreator
 
 export enum AppTheming {
 	System = 'sys',
@@ -107,9 +108,16 @@ import {AnimationCreator, AnimStep, AnimDirection, AnimFillmode} from './animati
 import {cubicInOut} from 'svelte/easing'
 import {derived, get as getStore, Unsubscriber, Updater, writable} from 'svelte/store'
 import {renderAllKeyframeStyles, buildCursorKeyframeStyle, wrapInTags, selectedKeyframeStyle, debounce} from './utils'
-import ModalViewer, {closeModal, Modals, openModal} from './ModalViewer.svelte'
+import ModalViewer, {openModal} from './ModalViewer.svelte'
 import SidebarLeft from './SidebarLeft.svelte'
 import SidebarRight from './SidebarRight.svelte'
+
+import ModalAbout from './modals/About.svelte'
+import ModalImport from './modals/Import.svelte'
+import ModalExport from './modals/Export.svelte'
+import ModalSettings from './modals/Settings.svelte'
+import ModalTarget from './modals/Target.svelte'
+import ModalDiscard from './modals/Discard.svelte'
 
 let targetViewportEl: HTMLDivElement
 let targetShadowDOM: ShadowRoot
@@ -118,7 +126,6 @@ onMount(()=> {
 	animations.selectProject(0)
 })
 
-const animations = new AnimationCreator
 const currentProject = derived(animations, ($)=> $.projects[$.curPrj])
 const currentProjectReacted = derived(currentProject, ($)=> $)
 $:currentProjectStore = $currentProject
@@ -350,18 +357,19 @@ function toggleChangeVpBg() {
 	else currentAction.set(CreatorAction.ChangeVpBg)
 }
 
-function approveAnimDiscard() {
-	animations.discardProject()
-	closeModal()
-}
-
-function discardAllProjects() {
-	animations.reset()
-	closeModal()
-}
-
-function onOpenModal(id: Modals) {
-	stopAnimation()
+function discardWholeProject() {
+	openModal({
+		comp: ModalDiscard,
+		props: {
+			title: 'Discard everything',
+			msg: 'Are you sure you want to discard all projects including the targets HTML & CSS?',
+			keep: (closeModal)=> closeModal(),
+			discard: (closeModal)=> {
+				animations.reset()
+				closeModal()
+			},
+		},
+	})
 }
 
 let showSidebarLeft = true
@@ -517,7 +525,7 @@ viewportHeightQuery.addEventListener('change', ()=> {
 <main>
 	<header>
 		<div class='tab-bar flex nowrap'>
-			<button class='app-logo flex content-center' on:click={()=> openModal(Modals.AboutApp)}>
+			<button class='app-logo flex content-center' on:click={()=> openModal({comp: ModalAbout})}>
 				<img src='app-icon/ico-64.png' alt='Logo'>
 			</button>
 
@@ -544,14 +552,14 @@ viewportHeightQuery.addEventListener('change', ()=> {
 			</div>
 
 			<div class='options flex align-right'>
-				<button on:click={()=> openModal(Modals.Import)} class='import flex content-center gap-05'>
+				<button on:click={()=> openModal({comp: ModalImport, opts: {noEsc: true}})} class='import flex content-center gap-05'>
 					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 						<path d='M20 8V22H4V2H12M20 8H12V2M20 8L12 2M12 19L12 11M12 11L15 14M12 11L9 14'/>
 					</svg>
 					<span class='label'>Import</span>
 				</button>
 
-				<button on:click={()=> openModal(Modals.Export)} class='export flex content-center gap-05'>
+				<button on:click={()=> openModal({comp: ModalExport})} class='export flex content-center gap-05'>
 					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 						<path d='M20 8V22H4V2H12M20 8H12V2M20 8L12 2M12 11V19M12 19L9 16M12 19L15 16'/>
 					</svg>
@@ -559,7 +567,7 @@ viewportHeightQuery.addEventListener('change', ()=> {
 					<span class='label'>Export</span>
 				</button>
 
-				<button on:click={()=> openModal(Modals.Settings)} class='settings flex content-center'>
+				<button on:click={()=> openModal({comp: ModalSettings})} class='settings flex content-center'>
 					<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 						<path stroke-linejoin='bevel' d='M10.3636 6.90909V2.5H12H13.6364V6.90909L14.4837 7.26879L18.0848 3.79187L20.2081 5.91524L16.7312 9.51634L17.0909 10.3636H21.5V12V13.6364H17.0909L16.7478 14.5001L20.3733 17.9196L17.9196 20.3733L14.5001 16.7478L13.6364 17.0909V21.5H12H10.3636V17.0909L9.4999 16.7478L6.08042 20.3733L3.62669 17.9196L7.25216 14.5001L6.90909 13.6364H2.5V12V10.3636H6.90909L7.26879 9.51634L3.79187 5.91524L5.91524 3.79187L9.51634 7.26879L10.3636 6.90909Z'/>
 						<circle cx='12' cy='12' r='2.5'/>
@@ -575,7 +583,7 @@ viewportHeightQuery.addEventListener('change', ()=> {
 				</svg>
 			</button>
 
-			<button on:click={()=> openModal(Modals.Target)} class='btn has-icon'>
+			<button on:click={()=> openModal({comp: ModalTarget})} class='btn has-icon'>
 				<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 					<path d='M15.7736 5.36887C14.3899 4.50149 12.7535 4 11 4C6.02944 4 2 8.02944 2 13C2 17.9706 6.02944 22 11 22C15.9706 22 20 17.9706 20 13C20 11.3038 19.5308 9.71728 18.7151 8.36302'/>
 					<path d='M12.8458 8.35174C12.2747 8.12477 11.6519 8 11 8C8.23858 8 6 10.2386 6 13C6 15.7614 8.23858 18 11 18C13.7614 18 16 15.7614 16 13C16 12.4099 15.8978 11.8438 15.7101 11.3182'/>
@@ -620,7 +628,7 @@ viewportHeightQuery.addEventListener('change', ()=> {
 				{/if}
 			</div>
 
-			<button on:click={()=> openModal(Modals.DiscardWholeProject)} class='btn has-icon'>
+			<button on:click={discardWholeProject} class='btn has-icon'>
 				<svg class='icon stroke icon-15' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
 					<path d='M18 4.8V20.8H6V4.8M9 7.6L9 18M12 7.6L12 18M15 7.6L15 18M4 4.8L8.00002 4.8M8.00002 4.8L16 4.8M8.00002 4.8L10 3L14 3L16 4.8M16 4.8L20 4.8'/>
 				</svg>
@@ -640,7 +648,6 @@ viewportHeightQuery.addEventListener('change', ()=> {
 		{#if showSidebarLeft}
 		<SidebarLeft
 			{sidebarAnim}
-			{openModal}
 			{doesAnimTargetElExist}
 			{currentProject}
 			{currentProjectStore}
@@ -777,12 +784,7 @@ viewportHeightQuery.addEventListener('change', ()=> {
 
 
 
-<ModalViewer
-	{animations}
-	{onOpenModal}
-	on:approveAnimDiscard={approveAnimDiscard}
-	on:discardAllProjects={discardAllProjects}
-/>
+<ModalViewer onOpenModal={()=> stopAnimation()}/>
 
 
 
