@@ -596,7 +596,7 @@ viewportHeightQuery.addEventListener('change', ()=> {
 			<button on:click={togglePlayOnlyCurSelAnim} class='btn has-icon'>
 				<div class='checkbox flex content-center' class:active={!$playOnlyCurSelAnim}>
 					<svg viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
-						<path d='M 4 11, l 5 4, l 8 -10' stroke-width='2'/>
+						<path d='M 4 11 l 5 4 l 8 -10' stroke-width='2'/>
 					</svg>
 				</div>
 				<span class='label'>Play all animations</span>
