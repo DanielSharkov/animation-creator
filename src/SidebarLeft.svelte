@@ -1,7 +1,7 @@
 <script lang='ts'>
 import {AnimationProject, AnimDirection, AnimFillmode, EasingFunctions} from './animation_creator'
 import {cubicOut} from 'svelte/easing'
-import animations, {cancelCreatorAction, CreatorAction, currentAction} from './App.svelte'
+import {cancelCreatorAction, CreatorAction, currentAction, animations} from './App.svelte'
 import {openModal} from './ModalViewer.svelte'
 import ModalDiscard from './modals/Discard.svelte'
 import ModalTimingFnEdit from './modals/TimingFnEdit.svelte'
