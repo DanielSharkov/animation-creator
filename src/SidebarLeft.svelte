@@ -51,7 +51,7 @@ function visualTimingFnEditor() {
 		props: {
 			preset: $currentProjectStore.timingFunc || undefined,
 			apply(timingFn) {
-				$currentProject.changeStepTimingFunc(timingFn)
+				$currentProject.changeTimingFunc(timingFn)
 			},
 		},
 	})
