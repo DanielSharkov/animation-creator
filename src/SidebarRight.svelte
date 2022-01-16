@@ -1,7 +1,9 @@
 <script lang='ts'>
 import {cubicOut} from 'svelte/easing'
+import {openModal} from './ModalViewer.svelte'
 import {EasingFunctions} from './animation_creator'
 import {cancelCreatorAction, CreatorAction, currentAction} from './App.svelte'
+import ModalTimingFnEdit from './modals/TimingFnEdit.svelte'
 export let sidebarAnim
 export let currentProjectStore
 export let currentProject
@@ -20,6 +22,19 @@ const timingFuncPanelAnim =(node, o?)=> ({
 		`transform: translateX(${101 - 101 * cubicOut(t)}%);`
 	)
 })
+
+function visualTimingFnEditor() {
+	openModal({
+		comp: ModalTimingFnEdit,
+		opts: {noEsc: true},
+		props: {
+			preset: selectedStep.timingFunc || undefined,
+			apply(timingFn) {
+				$currentProject.changeStepTimingFunc(timingFn)
+			},
+		},
+	})
+}
 </script>
 
 
@@ -114,6 +129,21 @@ const timingFuncPanelAnim =(node, o?)=> ({
 
 					<div class='options grid gap-1'>
 						<div class='input-field'>
+							<button on:click={visualTimingFnEditor} class='btn has-icon'>
+								<svg class='icon icon-2' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+									<path class='stroke' d='M8.5 2.5V21.5M15.5 2.5V21.5M2.5 15.5H21.5M2.5 8.5H21.5' stroke-opacity='0.1' stroke-width='0.5'/>
+									<path d='M2.5 21.5C17 17 7 7 21.5 2.5' stroke='url(#paint0_linear_1908_2)' stroke-linecap='round'/>
+									<path class='stroke' d='M7 7L21.5 2.5M2.5 21.5L17 17' stroke-width='0.5' stroke-linecap='round'/>
+									<path class='stroke' d='M21.75 21.75H2.25V2.25H21.75V21.75Z' stroke-opacity='0.5' stroke-width='0.5'/>
+									<defs>
+									<linearGradient id='paint0_linear_1908_2' x1='12' y1='3' x2='12' y2='21' gradientUnits='userSpaceOnUse'>
+										<stop stop-color='#3D8AFF'/>
+										<stop offset='1' stop-color='#15DF66'/>
+									</linearGradient>
+									</defs>
+								</svg>
+								<span class='label'>Visual cubic-bezier editor</span>
+							</button>
 							<input type='text'
 								id='custom-timing-func'
 								value={selectedStep.timingFunc || ''}
