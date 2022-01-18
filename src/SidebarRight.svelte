@@ -1,40 +1,40 @@
 <script lang='ts'>
-import {cubicOut} from 'svelte/easing'
-import {openModal} from './ModalViewer.svelte'
-import {EasingFunctions} from './animation_creator'
-import {cancelCreatorAction, CreatorAction, currentAction} from './App.svelte'
-import ModalTimingFnEdit from './modals/TimingFnEdit.svelte'
-export let sidebarAnim
-export let currentProjectStore
-export let currentProject
-export let selectedStep
+	import {cubicOut} from 'svelte/easing'
+	import {openModal} from './ModalViewer.svelte'
+	import {EasingFunctions} from './animation_creator'
+	import {cancelCreatorAction, CreatorAction, currentAction} from './App.svelte'
+	import ModalTimingFnEdit from './modals/TimingFnEdit.svelte'
+	export let sidebarAnim
+	export let currentProjectStore
+	export let currentProject
+	export let selectedStep
 
-function timeByPercentage(percentage: number) {
-	return $currentProjectStore.duration / 100 * percentage
-}
+	function timeByPercentage(percentage: number) {
+		return $currentProjectStore.duration / 100 * percentage
+	}
 
-enum SideBarTab {Selected, Index}
-let sideBarTab = SideBarTab.Selected
+	enum SideBarTab {Selected, Index}
+	let sideBarTab = SideBarTab.Selected
 
-const timingFuncPanelAnim =(node, o?)=> ({
-	duration: 250,
-	css: (t)=> (
-		`transform: translateX(${101 - 101 * cubicOut(t)}%);`
-	)
-})
-
-function visualTimingFnEditor() {
-	openModal({
-		comp: ModalTimingFnEdit,
-		opts: {noEsc: true},
-		props: {
-			preset: selectedStep.timingFunc || undefined,
-			apply(timingFn) {
-				$currentProject.changeStepTimingFunc(timingFn)
-			},
-		},
+	const timingFuncPanelAnim =(node, o?)=> ({
+		duration: 250,
+		css: (t)=> (
+			`transform: translateX(${101 - 101 * cubicOut(t)}%);`
+		)
 	})
-}
+
+	function visualTimingFnEditor() {
+		openModal({
+			comp: ModalTimingFnEdit,
+			opts: {noEsc: true},
+			props: {
+				preset: selectedStep.timingFunc || undefined,
+				apply(timingFn) {
+					$currentProject.changeStepTimingFunc(timingFn)
+				},
+			},
+		})
+	}
 </script>
 
 
@@ -192,43 +192,43 @@ function visualTimingFnEditor() {
 
 
 <style lang='stylus'>
-.placeholder
-	padding: 1rem
+	.placeholder
+		padding: 1rem
 
-.tabs > button
-	font-size: 1.15em
-	flex: 1 1 auto
-	padding: 1rem
-	border-top: solid 2px transparent
-	&:not(:first-child)
-		border-left: solid 1px var(--border)
-	&:not(.active)
-		background-color: var(--tabs-unselected)
-		border-bottom: solid 1px var(--border)
-		&:hover
-			background-color: var(--bg)
-			border-top-color: var(--heading)
-	&.active
-		border-top-color: var(--prime)
-		color: var(--prime)
+	.tabs > button
+		font-size: 1.15em
+		flex: 1 1 auto
+		padding: 1rem
+		border-top: solid 2px transparent
+		&:not(:first-child)
+			border-left: solid 1px var(--border)
+		&:not(.active)
+			background-color: var(--tabs-unselected)
+			border-bottom: solid 1px var(--border)
+			&:hover
+				background-color: var(--bg)
+				border-top-color: var(--heading)
+		&.active
+			border-top-color: var(--prime)
+			color: var(--prime)
 
-.content
-	padding: 1rem
-	> .step-editor
-		align-content: start
-	> .steps-index
-		overflow-y: auto
-		> button
-			padding: 0
-			font-size: 1.15em
-			> .index
-				padding: .5em 1em
-			&.active
-				box-shadow: 0 0 20px var(--prime-05)
-				background-color: var(--prime-01)
-				border-color: var(--prime)
-				color: var(--prime)
+	.content
+		padding: 1rem
+		> .step-editor
+			align-content: start
+		> .steps-index
+			overflow-y: auto
+			> button
+				padding: 0
+				font-size: 1.15em
 				> .index
-					background-color: var(--prime)
-					color: var(--bg)
+					padding: .5em 1em
+				&.active
+					box-shadow: 0 0 20px var(--prime-05)
+					background-color: var(--prime-01)
+					border-color: var(--prime)
+					color: var(--prime)
+					> .index
+						background-color: var(--prime)
+						color: var(--bg)
 </style>

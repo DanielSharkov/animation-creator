@@ -1,61 +1,61 @@
 <script lang='ts'>
-import {AnimationProject, AnimDirection, AnimFillmode, EasingFunctions} from './animation_creator'
-import {cubicOut} from 'svelte/easing'
-import {cancelCreatorAction, CreatorAction, currentAction, animations} from './App.svelte'
-import {openModal} from './ModalViewer.svelte'
-import ModalDiscard from './modals/Discard.svelte'
-import ModalTimingFnEdit from './modals/TimingFnEdit.svelte'
+	import {AnimationProject, AnimDirection, AnimFillmode, EasingFunctions} from './animation_creator'
+	import {cubicOut} from 'svelte/easing'
+	import {cancelCreatorAction, CreatorAction, currentAction, animations} from './App.svelte'
+	import {openModal} from './ModalViewer.svelte'
+	import ModalDiscard from './modals/Discard.svelte'
+	import ModalTimingFnEdit from './modals/TimingFnEdit.svelte'
 
-export let sidebarAnim
-export let doesAnimTargetElExist: boolean
-export let currentProject: SvelteStore<AnimationProject>
-export let currentProjectStore
+	export let sidebarAnim
+	export let doesAnimTargetElExist: boolean
+	export let currentProject: SvelteStore<AnimationProject>
+	export let currentProjectStore
 
-const timingFuncPanelAnim =(node, o?)=> ({
-	duration: 250,
-	css: (t)=> (
-		`transform: translateX(${101 - 101 * cubicOut(t)}%);`
-	)
-})
+	const timingFuncPanelAnim =(node, o?)=> ({
+		duration: 250,
+		css: (t)=> (
+			`transform: translateX(${101 - 101 * cubicOut(t)}%);`
+		)
+	})
 
-function changeTargetElSelector(e: Event & {currentTarget: EventTarget & HTMLInputElement}) {
-	const sltr = e.currentTarget.value
-	try {
-		// check if selector is valid
-		document.querySelector(sltr)
-		$currentProject.targetChangeSelector(sltr)
-	} catch(err) {
-		e.currentTarget.value = $currentProjectStore.targetEl
+	function changeTargetElSelector(e: Event & {currentTarget: EventTarget & HTMLInputElement}) {
+		const sltr = e.currentTarget.value
+		try {
+			// check if selector is valid
+			document.querySelector(sltr)
+			$currentProject.targetChangeSelector(sltr)
+		} catch(err) {
+			e.currentTarget.value = $currentProjectStore.targetEl
+		}
 	}
-}
 
-function discardAnim() {
-	openModal({
-		comp: ModalDiscard,
-		props: {
-			title: 'Discard Animation',
-			msg: 'Are you sure you wan\'t to discard this animation?',
-			discard: (closeModal)=> {
-				animations.discardProject()
-				closeModal()
+	function discardAnim() {
+		openModal({
+			comp: ModalDiscard,
+			props: {
+				title: 'Discard Animation',
+				msg: 'Are you sure you wan\'t to discard this animation?',
+				discard: (closeModal)=> {
+					animations.discardProject()
+					closeModal()
+				},
+				keep: (closeModal)=> closeModal(),
 			},
-			keep: (closeModal)=> closeModal(),
-		},
-	})
-}
+		})
+	}
 
-function visualTimingFnEditor() {
-	openModal({
-		comp: ModalTimingFnEdit,
-		opts: {noEsc: true},
-		props: {
-			preset: $currentProjectStore.timingFunc || undefined,
-			apply(timingFn) {
-				$currentProject.changeTimingFunc(timingFn)
+	function visualTimingFnEditor() {
+		openModal({
+			comp: ModalTimingFnEdit,
+			opts: {noEsc: true},
+			props: {
+				preset: $currentProjectStore.timingFunc || undefined,
+				apply(timingFn) {
+					$currentProject.changeTimingFunc(timingFn)
+				},
 			},
-		},
-	})
-}
+		})
+	}
 </script>
 
 
@@ -273,22 +273,22 @@ function visualTimingFnEditor() {
 
 
 <style lang='stylus'>
-.header
-	.discard
-		&:hover
-			box-shadow: 0 0 20px var(--clr-red)
-			background-color: var(--clr-red-025)
-			border-color: var(--clr-red)
-			color: var(--clr-red)
-		&:active, &:focus
-			box-shadow: 0 0 20px var(--clr-red)
-			background-color: var(--clr-red)
-			border-color: var(--clr-red)
-			color: #fff
+	.header
+		.discard
+			&:hover
+				box-shadow: 0 0 20px var(--clr-red)
+				background-color: var(--clr-red-025)
+				border-color: var(--clr-red)
+				color: var(--clr-red)
+			&:active, &:focus
+				box-shadow: 0 0 20px var(--clr-red)
+				background-color: var(--clr-red)
+				border-color: var(--clr-red)
+				color: #fff
 
-.selector-search-not-found
-	padding: .5em
-	border-radius: var(--btn-radius)
-	background-color: var(--clr-yellow)
-	color: #000
+	.selector-search-not-found
+		padding: .5em
+		border-radius: var(--btn-radius)
+		background-color: var(--clr-yellow)
+		color: #000
 </style>
