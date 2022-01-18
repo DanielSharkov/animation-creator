@@ -16,4 +16,4 @@ If you would like to fork this project and adjust the code your needs, just clon
 install all dependencies by `npm i` and finally run `npm run dev` -
 the app then should be running on [localhost:5000](http://localhost:5000)!
 
-https://user-images.githubusercontent.com/26609752/145655061-542653c1-4f31-4db0-b35e-ba86ccbfc691.mp4
+https://user-images.githubusercontent.com/26609752/150036332-60197e2d-8175-4f5e-ba86-5b7e1fe88448.mp4
